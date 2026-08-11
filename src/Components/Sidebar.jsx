@@ -1,6 +1,5 @@
-import { useState } from "react";
 import logo from "../assets/images/NTF_logo_black.png";
-import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = ({
@@ -14,15 +13,6 @@ const Sidebar = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [openMenus, setOpenMenus] = useState({});
-
-  const toggleSubmenu = (menuName) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [menuName]: !prev[menuName],
-    }));
-  };
 
   return (
     <>
@@ -41,7 +31,6 @@ const Sidebar = ({
           collapsed ? "w-20" : "w-64"
         }`}
       >
-        {/* Logo */}
         <div
           className={`h-16 border-b border-gray-100 flex items-center ${
             collapsed ? "justify-center px-2" : "justify-between px-4"
@@ -62,30 +51,22 @@ const Sidebar = ({
           </button>
         </div>
 
-        {/* Menu */}
         <div className="mt-5 px-3 overflow-y-auto">
           {menuItems.map((item) => {
-            const hasSubmenu = item.submenu?.length > 0;
-
             const active =
               activeMenu === item.name ||
-              item.submenu?.some((sub) => location.pathname === sub.path);
+              (item.path && location.pathname === item.path);
 
             return (
               <div key={item.name} className="mb-2">
-                {/* Main Menu */}
                 <button
                   onClick={() => {
-                    if (hasSubmenu) {
-                      toggleSubmenu(item.name);
-                    } else {
-                      setActiveMenu(item.name);
+                    setActiveMenu(item.name);
 
-                      if (item.path) navigate(item.path);
+                    if (item.path) navigate(item.path);
 
-                      if (window.innerWidth < 1024) {
-                        setCollapsed(true);
-                      }
+                    if (window.innerWidth < 1024) {
+                      setCollapsed(true);
                     }
                   }}
                   className={`w-full flex items-center rounded-xl py-3 transition-all
@@ -110,42 +91,7 @@ const Sidebar = ({
                       <span className="text-sm font-medium">{item.name}</span>
                     )}
                   </div>
-
-                  {!collapsed &&
-                    hasSubmenu &&
-                    (openMenus[item.name] ? (
-                      <ChevronDown size={18} />
-                    ) : (
-                      <ChevronRight size={18} />
-                    ))}
                 </button>
-
-                {/* Submenu */}
-                {!collapsed && hasSubmenu && openMenus[item.name] && (
-                  <div className="ml-12 mt-2 space-y-1">
-                    {item.submenu.map((sub) => (
-                      <button
-                        key={sub.name}
-                        onClick={() => {
-                          setActiveMenu(sub.name);
-                          navigate(sub.path);
-
-                          if (window.innerWidth < 1024) {
-                            setCollapsed(true);
-                          }
-                        }}
-                        className={`w-full text-left rounded-lg px-3 py-2 text-sm transition
-                          ${
-                            location.pathname === sub.path
-                              ? "bg-primary text-white"
-                              : "text-gray-600 hover:bg-primary/10 hover:text-primary"
-                          }`}
-                      >
-                        {sub.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             );
           })}

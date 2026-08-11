@@ -1,4 +1,3 @@
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import PublishOutlinedIcon from "@mui/icons-material/PublishOutlined";
 
 const inputClass =
@@ -6,7 +5,7 @@ const inputClass =
 
 const labelClass = "block text-xs font-semibold text-gray-600 mb-1.5";
 
-const QuestionSettings = ({ question, onChange, onSaveDraft, onPublish }) => {
+const QuestionSettings = ({ question, onChange, onPublish }) => {
   if (!question) return null;
 
   const { options, correctOption } = question;
@@ -49,14 +48,6 @@ const QuestionSettings = ({ question, onChange, onSaveDraft, onPublish }) => {
       </div>
 
       <div className="border-t border-gray-100 p-4 flex gap-3 bg-gray-50/50">
-        <button
-          onClick={onSaveDraft}
-          className="flex-1 h-11 rounded-xl border border-primary text-primary font-semibold text-sm hover:bg-primary/5 transition flex items-center justify-center gap-2"
-        >
-          <SaveOutlinedIcon sx={{ fontSize: 18 }} />
-          Save Draft
-        </button>
-
         <button
           onClick={onPublish}
           className="flex-1 h-11 rounded-xl bg-gradient-to-r from-primary to-primary-dark text-white font-semibold text-sm hover:opacity-95 hover:shadow-md hover:shadow-primary/30 active:scale-[0.98] transition flex items-center justify-center gap-2"

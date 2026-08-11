@@ -20,11 +20,47 @@ const inputSx = {
   },
 };
 
-const Filters = () => {
-  const [department, setDepartment] = useState("");
-  const [subDepartment, setSubDepartment] = useState("");
-  const [line, setLine] = useState("");
-  const [shift, setShift] = useState("");
+const menuProps = {
+  PaperProps: {
+    sx: {
+      "& .MuiMenuItem-root": {
+        fontSize: "13px",
+        minHeight: "34px",
+      },
+    },
+  },
+};
+
+const Filters = ({
+  values: externalValues,
+  onChange: externalOnChange,
+  departmentOptions = ["Assembly", "Production", "Quality"],
+  subDepartmentOptions = ["Sub 1", "Sub 2"],
+  lineOptions = ["Line 1", "Line 2", "Line 3"],
+  machineOptions = ["Machine 1", "Machine 2", "Machine 3"],
+  machineLabel = "Shift",
+  showDates = true,
+}) => {
+  const [internalValues, setInternalValues] = useState({
+    department: "",
+    subDepartment: "",
+    line: "",
+    machine: "",
+    fromDate: "",
+    toDate: "",
+  });
+
+  const values = externalValues ?? internalValues;
+
+  const updateValue = (key) => (event) => {
+    const next = { ...values, [key]: event.target.value };
+
+    if (externalOnChange) {
+      externalOnChange(next);
+    } else {
+      setInternalValues(next);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 mb-4">
@@ -35,27 +71,20 @@ const Filters = () => {
           <InputLabel>Department</InputLabel>
 
           <Select
-            value={department}
+            value={values.department}
             label="Department"
-            onChange={(e) => setDepartment(e.target.value)}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  "& .MuiMenuItem-root": {
-                    fontSize: "13px",
-                    minHeight: "34px",
-                  },
-                },
-              },
-            }}
+            onChange={updateValue("department")}
+            MenuProps={menuProps}
           >
             <MenuItem value="">
               <em>All</em>
             </MenuItem>
 
-            <MenuItem value="Assembly">Assembly</MenuItem>
-            <MenuItem value="Production">Production</MenuItem>
-            <MenuItem value="Quality">Quality</MenuItem>
+            {departmentOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
@@ -63,16 +92,20 @@ const Filters = () => {
           <InputLabel>Sub Department</InputLabel>
 
           <Select
-            value={subDepartment}
+            value={values.subDepartment}
             label="Sub Department"
-            onChange={(e) => setSubDepartment(e.target.value)}
+            onChange={updateValue("subDepartment")}
+            MenuProps={menuProps}
           >
             <MenuItem value="">
               <em>All</em>
             </MenuItem>
 
-            <MenuItem value="Sub 1">Sub 1</MenuItem>
-            <MenuItem value="Sub 2">Sub 2</MenuItem>
+            {subDepartmentOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
@@ -80,79 +113,93 @@ const Filters = () => {
           <InputLabel>Line</InputLabel>
 
           <Select
-            value={line}
+            value={values.line}
             label="Line"
-            onChange={(e) => setLine(e.target.value)}
+            onChange={updateValue("line")}
+            MenuProps={menuProps}
           >
             <MenuItem value="">
               <em>All</em>
             </MenuItem>
 
-            <MenuItem value="Line 1">Line 1</MenuItem>
-            <MenuItem value="Line 2">Line 2</MenuItem>
-            <MenuItem value="Line 3">Line 3</MenuItem>
+            {lineOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
         <FormControl fullWidth size="small" sx={inputSx}>
-          <InputLabel>Shift</InputLabel>
+          <InputLabel>{machineLabel}</InputLabel>
 
           <Select
-            value={shift}
-            label="Shift"
-            onChange={(e) => setShift(e.target.value)}
+            value={values.machine}
+            label={machineLabel}
+            onChange={updateValue("machine")}
+            MenuProps={menuProps}
           >
             <MenuItem value="">
               <em>All</em>
             </MenuItem>
 
-            <MenuItem value="Morning">Morning</MenuItem>
-            <MenuItem value="Evening">Evening</MenuItem>
-            <MenuItem value="Night">Night</MenuItem>
+            {machineOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
-        <TextField
-          fullWidth
-          size="small"
-          label="From Date"
-          type="date"
-          slotProps={{
-            inputLabel: {
-              shrink: true,
-            },
-          }}
-          sx={{
-            ...inputSx,
-            "& .MuiOutlinedInput-input": {
-              padding: "6px 12px",
-              height: "32px",
-              boxSizing: "border-box",
-              fontSize: "14px",
-            },
-          }}
-        />
+        {showDates && (
+          <>
+            <TextField
+              fullWidth
+              size="small"
+              label="From Date"
+              type="date"
+              value={values.fromDate}
+              onChange={updateValue("fromDate")}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+              sx={{
+                ...inputSx,
+                "& .MuiOutlinedInput-input": {
+                  padding: "6px 12px",
+                  height: "32px",
+                  boxSizing: "border-box",
+                  fontSize: "14px",
+                },
+              }}
+            />
 
-        <TextField
-          fullWidth
-          size="small"
-          label="To Date"
-          type="date"
-          slotProps={{
-            inputLabel: {
-              shrink: true,
-            },
-          }}
-          sx={{
-            ...inputSx,
-            "& .MuiOutlinedInput-input": {
-              padding: "6px 12px",
-              height: "32px",
-              boxSizing: "border-box",
-              fontSize: "14px",
-            },
-          }}
-        />
+            <TextField
+              fullWidth
+              size="small"
+              label="To Date"
+              type="date"
+              value={values.toDate}
+              onChange={updateValue("toDate")}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+              sx={{
+                ...inputSx,
+                "& .MuiOutlinedInput-input": {
+                  padding: "6px 12px",
+                  height: "32px",
+                  boxSizing: "border-box",
+                  fontSize: "14px",
+                },
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
   );

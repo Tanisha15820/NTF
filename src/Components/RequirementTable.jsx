@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { TablePagination, IconButton, Tooltip } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import RequirementPopup from "./RequirementPopup";
@@ -35,7 +33,6 @@ const requirementData = [
 ];
 
 const months = ["AUG", "SEP", "OCT", "NOV", "DEC"];
-const roles = ["PP", "SP", "FN01", "FN02"];
 
 const approvalStyles = {
   "System Approved": {
@@ -76,7 +73,6 @@ const RequirementTable = () => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-5 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary-light to-primary-dark flex items-center justify-center shadow-sm">
@@ -104,7 +100,6 @@ const RequirementTable = () => {
         <RequirementPopup open={open} onClose={() => setOpen(false)} />
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1200px] border-collapse">
           <thead>
@@ -113,13 +108,13 @@ const RequirementTable = () => {
                 rowSpan={2}
                 className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600 border-b border-r border-gray-200"
               >
-                Section Code
+                Department Name
               </th>
               <th
                 rowSpan={2}
                 className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600 border-b border-r border-gray-200"
               >
-                Section Name
+                Sub-Department Name
               </th>
               <th
                 rowSpan={2}
@@ -131,14 +126,14 @@ const RequirementTable = () => {
                 rowSpan={2}
                 className="px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600 border-b border-r border-gray-200"
               >
-                Approval
+                Machines
               </th>
 
               {months.map((month, idx) => (
                 <th
                   key={month}
-                  colSpan={4}
-                  className={`text-center text-xs font-bold text-white py-2.5 border-b border-r border-gray-200 ${
+                  rowSpan={2}
+                  className={`text-center text-xs font-bold text-white py-2.5 px-4 border-b border-r border-gray-200 ${
                     idx % 2 === 0 ? "bg-primary/90" : "bg-primary-light"
                   }`}
                 >
@@ -152,23 +147,6 @@ const RequirementTable = () => {
               >
                 Actions
               </th>
-            </tr>
-
-            <tr className="bg-gray-50">
-              {months.map((month, monthIdx) =>
-                roles.map((role, roleIdx) => (
-                  <th
-                    key={`${month}-${role}`}
-                    className={`px-2 py-2 text-center text-[11px] font-bold uppercase tracking-wider text-gray-500 ${
-                      monthIdx === 0 && roleIdx === 0
-                        ? "border-l border-gray-200"
-                        : ""
-                    } border-b border-r border-gray-200`}
-                  >
-                    {role}
-                  </th>
-                )),
-              )}
             </tr>
           </thead>
 
@@ -216,27 +194,27 @@ const RequirementTable = () => {
                         {row.approval}
                       </span>
                     </td>
+                   
 
-                    {months.map((month) =>
-                      roles.map((role) => (
+                    {months.map((month) => {
+                      const data = row[month.toLowerCase()];
+                      const total = Object.values(data).reduce(
+                        (sum, value) => sum + value,
+                        0,
+                      );
+                      return (
                         <td
-                          key={`${month}-${role}`}
-                          className="px-2 py-3 text-center text-xs tabular-nums text-gray-700 border-b border-r border-gray-100"
+                          key={month}
+                          className="px-4 py-3 text-center text-xs tabular-nums text-gray-700 border-b border-r border-gray-100"
                         >
-                          {row[month.toLowerCase()][role.toLowerCase()]}
+                          {total}
                         </td>
-                      )),
-                    )}
+                      );
+                    })}
 
                     <td className="px-4 py-3 text-center border-b border-gray-100">
                       <div className="flex items-center justify-center gap-0.5">
-                        <Tooltip title="View">
-                          <IconButton size="small">
-                            <VisibilityOutlinedIcon
-                              sx={{ color: "#6F4AE7", fontSize: 18 }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                     
                         <Tooltip title="Edit">
                           <IconButton size="small">
                             <EditOutlinedIcon
@@ -244,13 +222,7 @@ const RequirementTable = () => {
                             />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
-                          <IconButton size="small">
-                            <DeleteOutlineOutlinedIcon
-                              sx={{ color: "#EF4444", fontSize: 18 }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                     
                       </div>
                     </td>
                   </tr>
