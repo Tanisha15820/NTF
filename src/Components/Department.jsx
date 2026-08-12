@@ -1,14 +1,6 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Building2,
-  CirclePlus,
-  Pencil,
-  Search,
-  Trash2,
-  X,
-} from "lucide-react";
+import { Building2, CirclePlus, Pencil, Search, Trash2, X } from "lucide-react";
 import Filters from "./Filters";
 
 /* ============================================================
@@ -22,9 +14,7 @@ const STORAGE_KEY = "lms_departments";
 ============================================================ */
 
 const createId = (prefix) =>
-  `${prefix}_${Date.now()}_${Math.random()
-    .toString(36)
-    .substring(2, 8)}`;
+  `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
 const getInitialData = () => {
   try {
@@ -129,9 +119,7 @@ export default function Department() {
   const getStepCurrentValue = (session, stepIndex) => {
     const step = ALL_STEPS[stepIndex];
 
-    const dept = departments.find(
-      (d) => d.id === session.deptId
-    );
+    const dept = departments.find((d) => d.id === session.deptId);
 
     if (!dept) return "";
 
@@ -139,33 +127,25 @@ export default function Department() {
       return dept.name;
     }
 
-    const sec = dept.sections?.find(
-      (s) => s.id === session.sectionId
-    );
+    const sec = dept.sections?.find((s) => s.id === session.sectionId);
 
     if (step.key === "section") {
       return sec?.name || "";
     }
 
-    const ln = sec?.lines?.find(
-      (l) => l.id === session.lineId
-    );
+    const ln = sec?.lines?.find((l) => l.id === session.lineId);
 
     if (step.key === "line") {
       return ln?.name || "";
     }
 
-    const sub = ln?.subSections?.find(
-      (s) => s.id === session.subSectionId
-    );
+    const sub = ln?.subSections?.find((s) => s.id === session.subSectionId);
 
     if (step.key === "subSection") {
       return sub?.name || "";
     }
 
-    const mac = sub?.machines?.find(
-      (m) => m.id === session.machineId
-    );
+    const mac = sub?.machines?.find((m) => m.id === session.machineId);
 
     if (step.key === "machine") {
       return mac?.name || "";
@@ -209,9 +189,7 @@ export default function Department() {
     }
 
     setEditingRow(row);
-    setCurrentEditValue(
-      getStepCurrentValue(session, currentStep)
-    );
+    setCurrentEditValue(getStepCurrentValue(session, currentStep));
     setEditRowModal(true);
   };
 
@@ -222,17 +200,14 @@ export default function Department() {
 
     const rowId = getRowId(row);
 
-    const currentStep =
-      editStepMap[rowId] || 0;
+    const currentStep = editStepMap[rowId] || 0;
 
     const step = ALL_STEPS[currentStep];
 
     const value = currentEditValue.trim();
 
     if (!value) {
-      showToast(
-        `Please enter ${step.label.toLowerCase()} name.`
-      );
+      showToast(`Please enter ${step.label.toLowerCase()} name.`);
       return;
     }
 
@@ -256,23 +231,19 @@ export default function Department() {
         : session.lineId;
 
     const newSubSectionId =
-      step.key === "subSection" &&
-      !session.subSectionId
+      step.key === "subSection" && !session.subSectionId
         ? createId("subSection")
         : session.subSectionId;
 
     const newMachineId =
-      step.key === "machine" &&
-      !session.machineId
+      step.key === "machine" && !session.machineId
         ? createId("machine")
         : session.machineId;
 
     setDepartments((previous) => {
       const cloned = structuredClone(previous);
 
-      const dept = cloned.find(
-        (d) => d.id === session.deptId
-      );
+      const dept = cloned.find((d) => d.id === session.deptId);
 
       if (!dept) return previous;
 
@@ -282,9 +253,7 @@ export default function Department() {
 
       if (step.key === "section") {
         if (session.sectionId) {
-          const sec = dept.sections?.find(
-            (s) => s.id === session.sectionId
-          );
+          const sec = dept.sections?.find((s) => s.id === session.sectionId);
 
           if (sec) sec.name = value;
         } else {
@@ -300,15 +269,11 @@ export default function Department() {
       }
 
       if (step.key === "line") {
-        const sec = dept.sections?.find(
-          (s) => s.id === session.sectionId
-        );
+        const sec = dept.sections?.find((s) => s.id === session.sectionId);
 
         if (sec) {
           if (session.lineId) {
-            const ln = sec.lines?.find(
-              (l) => l.id === session.lineId
-            );
+            const ln = sec.lines?.find((l) => l.id === session.lineId);
 
             if (ln) ln.name = value;
           } else {
@@ -325,18 +290,14 @@ export default function Department() {
       }
 
       if (step.key === "subSection") {
-        const sec = dept.sections?.find(
-          (s) => s.id === session.sectionId
-        );
+        const sec = dept.sections?.find((s) => s.id === session.sectionId);
 
-        const ln = sec?.lines?.find(
-          (l) => l.id === session.lineId
-        );
+        const ln = sec?.lines?.find((l) => l.id === session.lineId);
 
         if (ln) {
           if (session.subSectionId) {
             const sub = ln.subSections?.find(
-              (s) => s.id === session.subSectionId
+              (s) => s.id === session.subSectionId,
             );
 
             if (sub) sub.name = value;
@@ -354,23 +315,15 @@ export default function Department() {
       }
 
       if (step.key === "machine") {
-        const sec = dept.sections?.find(
-          (s) => s.id === session.sectionId
-        );
+        const sec = dept.sections?.find((s) => s.id === session.sectionId);
 
-        const ln = sec?.lines?.find(
-          (l) => l.id === session.lineId
-        );
+        const ln = sec?.lines?.find((l) => l.id === session.lineId);
 
-        const sub = ln?.subSections?.find(
-          (s) => s.id === session.subSectionId
-        );
+        const sub = ln?.subSections?.find((s) => s.id === session.subSectionId);
 
         if (sub) {
           if (session.machineId) {
-            const mac = sub.machines?.find(
-              (m) => m.id === session.machineId
-            );
+            const mac = sub.machines?.find((m) => m.id === session.machineId);
 
             if (mac) mac.name = value;
           } else {
@@ -401,10 +354,7 @@ export default function Department() {
       [rowId]: updatedSession,
     }));
 
-    const nextStep = Math.min(
-      currentStep + 1,
-      ALL_STEPS.length - 1
-    );
+    const nextStep = Math.min(currentStep + 1, ALL_STEPS.length - 1);
 
     setEditStepMap((prev) => ({
       ...prev,
@@ -413,11 +363,10 @@ export default function Department() {
 
     showToast(
       `${step.label} ${
-        !session[`${step.key}Id`] &&
-        step.key !== "department"
+        !session[`${step.key}Id`] && step.key !== "department"
           ? "added"
           : "updated"
-      } successfully.`
+      } successfully.`,
     );
 
     setEditRowModal(false);
@@ -436,9 +385,7 @@ export default function Department() {
     }
 
     const duplicate = departments.some(
-      (department) =>
-        department.name.toLowerCase() ===
-        name.toLowerCase()
+      (department) => department.name.toLowerCase() === name.toLowerCase(),
     );
 
     if (duplicate) {
@@ -476,10 +423,7 @@ export default function Department() {
     if (!deleteTarget) return;
 
     setDepartments((previous) =>
-      previous.filter(
-        (department) =>
-          department.id !== deleteTarget.item.id
-      )
+      previous.filter((department) => department.id !== deleteTarget.item.id),
     );
 
     showToast("Department deleted successfully.");
@@ -584,82 +528,51 @@ export default function Department() {
         .join(" ")
         .toLowerCase();
 
-      const textOk =
-        !query || text.includes(query);
+      const textOk = !query || text.includes(query);
 
       const departmentOk =
-        !values.department ||
-        row.department?.name === values.department;
+        !values.department || row.department?.name === values.department;
 
       const sectionOk =
-        !values.subDepartment ||
-        row.section?.name === values.subDepartment;
+        !values.subDepartment || row.section?.name === values.subDepartment;
 
-      const lineOk =
-        !values.line ||
-        row.line?.name === values.line;
+      const lineOk = !values.line || row.line?.name === values.line;
 
-      const machineOk =
-        !values.machine ||
-        row.machine?.name === values.machine;
+      const machineOk = !values.machine || row.machine?.name === values.machine;
 
-      return (
-        textOk &&
-        departmentOk &&
-        sectionOk &&
-        lineOk &&
-        machineOk
-      );
+      return textOk && departmentOk && sectionOk && lineOk && machineOk;
     });
-  }, [
-    departments,
-    search,
-    filterValues,
-  ]);
+  }, [departments, search, filterValues]);
 
   /* ============================================================
      FILTER OPTIONS
   ============================================================ */
 
   const filterOptions = useMemo(() => {
-    const unique = (list) => [
-      ...new Set(list.filter(Boolean)),
-    ];
+    const unique = (list) => [...new Set(list.filter(Boolean))];
 
     const sections = [];
     const lines = [];
     const machines = [];
 
     departments.forEach((department) => {
-      (department.sections || []).forEach(
-        (section) => {
-          sections.push(section.name);
+      (department.sections || []).forEach((section) => {
+        sections.push(section.name);
 
-          (section.lines || []).forEach(
-            (line) => {
-              lines.push(line.name);
+        (section.lines || []).forEach((line) => {
+          lines.push(line.name);
 
-              (line.subSections || []).forEach(
-                (subSection) => {
-                  (subSection.machines || []).forEach(
-                    (machine) => {
-                      machines.push(machine.name);
-                    }
-                  );
-                }
-              );
-            }
-          );
-        }
-      );
+          (line.subSections || []).forEach((subSection) => {
+            (subSection.machines || []).forEach((machine) => {
+              machines.push(machine.name);
+            });
+          });
+        });
+      });
     });
 
     return {
-      departments: unique(
-        departments.map(
-          (department) => department.name
-        )
-      ),
+      departments: unique(departments.map((department) => department.name)),
       sections: unique(sections),
       lines: unique(lines),
       machines: unique(machines),
@@ -672,22 +585,18 @@ export default function Department() {
 
   return (
     <div className="text-[#26364d]">
-      <section className="p-[30px_25px]">
+      <section className="p-4 sm:p-[30px_25px]">
         <div className="overflow-hidden rounded-[17px] border border-[#e3e6eb] bg-white shadow-sm">
-
           {/* HEADER */}
 
-          <div className="flex items-center justify-between border-b border-[#edf0f3] px-5 py-[18px]">
+          <div className="flex flex-col gap-4 border-b border-[#edf0f3] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-[18px]">
             <div className="flex items-center gap-3">
-
-              <div className="flex h-[45px] w-[45px] items-center justify-center rounded-xl bg-[#6F4AE7] text-white">
+              <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-xl bg-[#6F4AE7] text-white">
                 <Building2 size={21} />
               </div>
 
-              <div>
-                <h1 className="text-[15px] font-bold">
-                  Departments
-                </h1>
+              <div className="min-w-0">
+                <h1 className="text-[15px] font-bold">Departments</h1>
 
                 <p className="mt-0.5 text-xs text-[#718096]">
                   Manage departments and their complete hierarchy
@@ -697,7 +606,7 @@ export default function Department() {
 
             <button
               onClick={openAddDepartment}
-              className="flex items-center gap-2 rounded-lg bg-[#6F4AE7] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5A38D6]"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#6F4AE7] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5A38D6] sm:w-auto"
             >
               <CirclePlus size={16} />
               Add Department
@@ -706,7 +615,7 @@ export default function Department() {
 
           {/* FILTER */}
 
-          <div className="m-5">
+          <div className="m-4 sm:m-5">
             <Filters
               values={filterValues}
               onChange={setFilterValues}
@@ -721,21 +630,15 @@ export default function Department() {
 
           {/* TABLE */}
 
-          <div className="mx-5 mb-5 overflow-hidden rounded-[14px] border border-[#e3e6eb]">
-
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf0f3] px-4 py-3">
-
+          <div className="mx-4 mb-4 overflow-hidden rounded-[14px] border border-[#e3e6eb] sm:mx-5 sm:mb-5">
+            <div className="flex flex-col gap-3 border-b border-[#edf0f3] px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-[13px] font-bold text-[#26364d]">
-                  Department List
+                <h3 className="text-[15px] font-bold text-[#26364d]">
+                  Department
                 </h3>
-
-                <p className="mt-0.5 text-xs text-[#718096]">
-                  {tableRows.length} record(s)
-                </p>
               </div>
 
-              <div className="relative w-full max-w-[300px]">
+              <div className="relative w-full sm:w-auto sm:max-w-[300px]">
                 <Search
                   size={15}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -743,9 +646,7 @@ export default function Department() {
 
                 <input
                   value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
+                  onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search..."
                   className="h-9 w-full rounded-lg border border-[#d5d9df] bg-[#f7f8fa] pl-9 pr-3 text-[13px] outline-none transition focus:border-[#6F4AE7] focus:bg-white"
                 />
@@ -754,56 +655,30 @@ export default function Department() {
 
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] border-collapse">
-
                 <thead>
                   <tr className="bg-[#f5f6f8]">
+                    <TableHeader>Department</TableHeader>
 
-                    <TableHeader>
-                      Department
-                    </TableHeader>
+                    <TableHeader>Section</TableHeader>
 
-                    <TableHeader>
-                      Section
-                    </TableHeader>
+                    <TableHeader>Line</TableHeader>
 
-                    <TableHeader>
-                      Line
-                    </TableHeader>
+                    <TableHeader>Sub-section</TableHeader>
 
-                    <TableHeader>
-                      Sub-section
-                    </TableHeader>
+                    <TableHeader>Machine</TableHeader>
 
-                    <TableHeader>
-                      Machine
-                    </TableHeader>
-
-                    <TableHeader>
-                      Actions
-                    </TableHeader>
-
+                    <TableHeader>Actions</TableHeader>
                   </tr>
                 </thead>
 
                 <tbody>
-
                   {tableRows.length === 0 ? (
-
                     <tr>
-                      <td
-                        colSpan={6}
-                        className="p-0"
-                      >
+                      <td colSpan={6} className="p-0">
                         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                          <Building2 size={42} className="mb-3 opacity-40" />
 
-                          <Building2
-                            size={42}
-                            className="mb-3 opacity-40"
-                          />
-
-                          <p className="mb-4 text-sm">
-                            No departments found.
-                          </p>
+                          <p className="mb-4 text-sm">No departments found.</p>
 
                           <button
                             onClick={openAddDepartment}
@@ -812,62 +687,42 @@ export default function Department() {
                             <CirclePlus size={15} />
                             Add Department
                           </button>
-
                         </div>
                       </td>
                     </tr>
-
                   ) : (
-
                     tableRows.map((row, index) => (
-
                       <tr
                         key={`${row.department.id}-${index}`}
                         className="group border-b border-[#edf0f2] last:border-0 hover:bg-[#fafaff]"
                       >
-
                         {/* DEPARTMENT */}
 
                         <TableCell bold>
-
                           <button
                             type="button"
                             onClick={() =>
-                              navigate(
-                                `/lms-section/${row.department.id}`
-                              )
+                              navigate(`/lms-section/${row.department.id}`)
                             }
                             className="font-semibold text-[#344760] transition hover:text-[#6F4AE7] hover:underline"
                           >
                             {row.department.name}
                           </button>
-
                         </TableCell>
 
-                        <TableCell>
-                          {row.section?.name || "-"}
-                        </TableCell>
+                        <TableCell>{row.section?.name || "-"}</TableCell>
 
-                        <TableCell>
-                          {row.line?.name || "-"}
-                        </TableCell>
+                        <TableCell>{row.line?.name || "-"}</TableCell>
 
-                        <TableCell>
-                          {row.subSection?.name || "-"}
-                        </TableCell>
+                        <TableCell>{row.subSection?.name || "-"}</TableCell>
 
-                        <TableCell>
-                          {row.machine?.name || "-"}
-                        </TableCell>
+                        <TableCell>{row.machine?.name || "-"}</TableCell>
 
                         <TableCell>
                           <div className="flex gap-2">
-
                             <ActionButton
                               title="Edit department"
-                              onClick={() =>
-                                openEditRow(row)
-                              }
+                              onClick={() => openEditRow(row)}
                             >
                               <Pencil size={15} />
                             </ActionButton>
@@ -876,29 +731,20 @@ export default function Department() {
                               danger
                               title="Delete department"
                               onClick={() =>
-                                askDeleteDepartment(
-                                  row.department
-                                )
+                                askDeleteDepartment(row.department)
                               }
                             >
                               <Trash2 size={15} />
                             </ActionButton>
-
                           </div>
                         </TableCell>
-
                       </tr>
-
                     ))
-
                   )}
-
                 </tbody>
-
               </table>
             </div>
           </div>
-
         </div>
       </section>
 
@@ -909,12 +755,9 @@ export default function Department() {
       <Modal
         open={departmentModal}
         title="Add Department"
-        onClose={() =>
-          setDepartmentModal(false)
-        }
+        onClose={() => setDepartmentModal(false)}
       >
         <div className="space-y-5">
-
           <div>
             <label className="mb-2 block text-xs font-semibold">
               Department Name
@@ -923,9 +766,7 @@ export default function Department() {
             <input
               autoFocus
               value={departmentName}
-              onChange={(e) =>
-                setDepartmentName(e.target.value)
-              }
+              onChange={(e) => setDepartmentName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   saveDepartment();
@@ -935,15 +776,11 @@ export default function Department() {
               className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm outline-none focus:border-[#6F4AE7]"
             />
           </div>
-
         </div>
 
         <ModalFooter>
-
           <button
-            onClick={() =>
-              setDepartmentModal(false)
-            }
+            onClick={() => setDepartmentModal(false)}
             className="rounded-lg bg-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-600"
           >
             Cancel
@@ -955,7 +792,6 @@ export default function Department() {
           >
             Save
           </button>
-
         </ModalFooter>
       </Modal>
 
@@ -970,32 +806,22 @@ export default function Department() {
 
           const rowId = getRowId(editingRow);
 
-          const step =
-            ALL_STEPS[
-              editStepMap[rowId] || 0
-            ];
+          const step = ALL_STEPS[editStepMap[rowId] || 0];
 
           return `Edit ${step?.label || ""} Name`;
         })()}
-        onClose={() =>
-          setEditRowModal(false)
-        }
+        onClose={() => setEditRowModal(false)}
       >
-
         <div className="space-y-5">
-
           <div>
-
             {(() => {
               if (!editingRow) return null;
 
               const rowId = getRowId(editingRow);
 
-              const stepIndex =
-                editStepMap[rowId] || 0;
+              const stepIndex = editStepMap[rowId] || 0;
 
-              const step =
-                ALL_STEPS[stepIndex];
+              const step = ALL_STEPS[stepIndex];
 
               return (
                 <>
@@ -1006,35 +832,24 @@ export default function Department() {
                   <input
                     autoFocus
                     value={currentEditValue}
-                    onChange={(e) =>
-                      setCurrentEditValue(
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => setCurrentEditValue(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         saveEditRow();
                       }
                     }}
-                    placeholder={`Enter ${
-                      step?.label || ""
-                    } name`}
+                    placeholder={`Enter ${step?.label || ""} name`}
                     className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm outline-none focus:border-[#6F4AE7]"
                   />
                 </>
               );
             })()}
-
           </div>
-
         </div>
 
         <ModalFooter>
-
           <button
-            onClick={() =>
-              setEditRowModal(false)
-            }
+            onClick={() => setEditRowModal(false)}
             className="rounded-lg bg-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-600"
           >
             Cancel
@@ -1046,9 +861,7 @@ export default function Department() {
           >
             Save
           </button>
-
         </ModalFooter>
-
       </Modal>
 
       {/* =====================================================
@@ -1058,14 +871,10 @@ export default function Department() {
       <Modal
         open={deleteModal}
         title="Confirm Delete"
-        onClose={() =>
-          setDeleteModal(false)
-        }
+        onClose={() => setDeleteModal(false)}
       >
-
         <div className="text-sm leading-6 text-gray-600">
           Are you sure you want to delete{" "}
-
           <strong className="text-gray-900">
             "{deleteTarget?.item?.name}"
           </strong>
@@ -1073,11 +882,8 @@ export default function Department() {
         </div>
 
         <ModalFooter>
-
           <button
-            onClick={() =>
-              setDeleteModal(false)
-            }
+            onClick={() => setDeleteModal(false)}
             className="rounded-lg bg-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-600"
           >
             Cancel
@@ -1089,17 +895,14 @@ export default function Department() {
           >
             Delete
           </button>
-
         </ModalFooter>
-
       </Modal>
 
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[1000] rounded-lg border-l-4 border-[#10b981] bg-[#202938] px-5 py-3 text-xs font-medium text-white shadow-xl">
+        <div className="fixed bottom-4 right-4 z-[1000] max-w-[calc(100vw-2rem)] rounded-lg border-l-4 border-[#10b981] bg-[#202938] px-5 py-3 text-xs font-medium text-white shadow-xl sm:bottom-6 sm:right-6">
           {toast}
         </div>
       )}
-
     </div>
   );
 }
@@ -1110,7 +913,7 @@ export default function Department() {
 
 function TableHeader({ children }) {
   return (
-    <th className="border-r border-[#e1e4e8] px-4 py-3 text-left text-[11px] font-bold uppercase text-[#3b4b62] last:border-r-0">
+    <th className="border-r border-[#e1e4e8] px-3 py-3 text-left text-[12px] font-bold uppercase text-[#3b4b62] last:border-r-0 sm:px-4">
       {children}
     </th>
   );
@@ -1120,16 +923,11 @@ function TableHeader({ children }) {
    TABLE CELL
 ============================================================ */
 
-function TableCell({
-  children,
-  bold,
-}) {
+function TableCell({ children, bold }) {
   return (
     <td
-      className={`border-r border-[#edf0f2] px-4 py-3 text-[13px] text-[#44556c] last:border-r-0 ${
-        bold
-          ? "font-semibold text-[#344760]"
-          : ""
+      className={`border-r border-[#edf0f2] px-3 py-3 text-[14px] text-[#44556c] last:border-r-0 sm:px-4 ${
+        bold ? "font-semibold text-[#344760]" : ""
       }`}
     >
       {children}
@@ -1141,12 +939,7 @@ function TableCell({
    ACTION BUTTON
 ============================================================ */
 
-function ActionButton({
-  children,
-  onClick,
-  danger,
-  title,
-}) {
+function ActionButton({ children, onClick, danger, title }) {
   return (
     <button
       title={title}
@@ -1166,40 +959,25 @@ function ActionButton({
    MODAL
 ============================================================ */
 
-function Modal({
-  open,
-  title,
-  onClose,
-  children,
-  large,
-}) {
+function Modal({ open, title, onClose, children, large }) {
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[500] flex items-center justify-center bg-[#141928]/50 p-5"
+      className="fixed inset-0 z-[500] flex items-center justify-center bg-[#141928]/50 p-3 sm:p-5"
       onMouseDown={(event) => {
-        if (
-          event.target === event.currentTarget
-        ) {
+        if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
-
       <div
-        className={`w-full overflow-hidden rounded-[17px] bg-white shadow-2xl ${
-          large
-            ? "max-w-[850px]"
-            : "max-w-[520px]"
+        className={`max-h-full w-full overflow-hidden rounded-[17px] bg-white shadow-2xl ${
+          large ? "max-w-[850px]" : "max-w-[520px]"
         }`}
       >
-
         <div className="flex items-center justify-between border-b border-[#e3e6eb] px-5 py-[18px]">
-
-          <h2 className="text-base font-bold">
-            {title}
-          </h2>
+          <h2 className="text-base font-bold">{title}</h2>
 
           <button
             onClick={onClose}
@@ -1207,13 +985,9 @@ function Modal({
           >
             <X size={21} />
           </button>
-
         </div>
 
-        <div className="max-h-[65vh] overflow-y-auto p-5">
-          {children}
-        </div>
-
+        <div className="max-h-[65vh] overflow-y-auto p-5">{children}</div>
       </div>
     </div>
   );
@@ -1223,13 +997,10 @@ function Modal({
    MODAL FOOTER
 ============================================================ */
 
-function ModalFooter({
-  children,
-}) {
+function ModalFooter({ children }) {
   return (
-    <div className="mt-6 flex justify-end gap-2 border-t border-[#e3e6eb] pt-4">
+    <div className="mt-6 flex flex-col-reverse gap-2 border-t border-[#e3e6eb] pt-4 sm:flex-row sm:justify-end">
       {children}
     </div>
   );
 }
-

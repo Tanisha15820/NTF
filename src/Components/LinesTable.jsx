@@ -22,11 +22,16 @@ const LinesTable = ({
       ? line.subSections
       : [];
 
-    const machines = subSections.flatMap((subSection) =>
+    const subSectionMachines = subSections.flatMap((subSection) =>
       Array.isArray(subSection.machines)
         ? subSection.machines
         : []
     );
+
+    const machines = [
+      ...(Array.isArray(line.machines) ? line.machines : []),
+      ...subSectionMachines,
+    ];
 
     return {
       loader:
@@ -68,7 +73,7 @@ const LinesTable = ({
   return (
     <div className="overflow-hidden rounded-[14px] border border-[#e3e6eb] bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#edf0f3] px-5 py-[18px]">
+      <div className="flex flex-col gap-3 border-b border-[#edf0f3] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-[18px]">
         <div>
           <h4 className="text-[13px] font-bold text-[#26364d]">
             Lines in this Section
@@ -84,7 +89,7 @@ const LinesTable = ({
         <button
           type="button"
           onClick={onAddLine}
-          className="flex items-center gap-1.5 rounded-lg bg-[#6c4ce8] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5937d1]"
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#6c4ce8] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5937d1] sm:w-auto"
         >
           <Plus size={14} />
           Add Line
@@ -92,14 +97,18 @@ const LinesTable = ({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto p-3">
-        <table className="w-full min-w-[700px] border-collapse overflow-hidden rounded-lg">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[700px] border-collapse">
           <thead>
             <tr className="bg-[#f5f6f8]">
               <TableHeader>Line Name</TableHeader>
+              <TableHeader>UniCode</TableHeader>
+              <TableHeader>Line Leaders</TableHeader>
+              <TableHeader>Mentor</TableHeader>
+              <TableHeader>Requirement</TableHeader>
+              <TableHeader>Description</TableHeader>
               <TableHeader>Loader</TableHeader>
               <TableHeader>Monitor</TableHeader>
-              <TableHeader>Req.</TableHeader>
               <TableHeader>Operators</TableHeader>
               <TableHeader>Actions</TableHeader>
             </tr>
@@ -108,14 +117,14 @@ const LinesTable = ({
           <tbody>
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-0">
+                <td colSpan={10} className="p-0">
                   <div className="flex flex-col items-center justify-center py-12 text-[#9aa3af]">
                     <Layers3
                       size={26}
                       className="mb-2 text-[#9aa3af]"
                     />
 
-                    <p className="text-[13px] font-medium text-[#718096]">
+                    <p className="text-[14px] font-medium text-[#718096]">
                       No lines assigned to this section.
                     </p>
 
@@ -155,26 +164,53 @@ const LinesTable = ({
                     className="border-b border-[#edf0f2] bg-white last:border-0 hover:bg-[#fafaff]"
                   >
                     {/* Line Name */}
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 sm:px-4">
                       <div>
                         <button
                           type="button"
                           onClick={() =>
                             handleLineClick(line, index)
                           }
-                          className="text-left text-[13px] font-semibold text-[#344760] underline-offset-2 transition-colors duration-200 hover:text-[#6c4ce8] hover:underline"
+                          className="text-left text-[14px] font-semibold text-[#344760] underline-offset-2 transition-colors duration-200 hover:text-[#6c4ce8] hover:underline"
                         >
                           {line?.name ||
                             `Line ${index + 1}`}
                         </button>
-
-                        {line?.code && (
-                          <p className="mt-0.5 text-xs text-[#718096]">
-                            {line.code}
-                          </p>
-                        )}
                       </div>
                     </td>
+
+                    {/* UniCode */}
+                    <TableCell>
+                      {line?.code || "—"}
+                    </TableCell>
+
+                    {/* Line Leaders */}
+                    <TableCell>
+                      <p className="max-w-[140px] truncate text-[13px] leading-5 text-[#44556c]">
+                        {line?.leaders || "—"}
+                      </p>
+                    </TableCell>
+
+                    {/* Mentor */}
+                    <TableCell>
+                      <p className="max-w-[140px] truncate text-[13px] leading-5 text-[#44556c]">
+                        {line?.mentor || "—"}
+                      </p>
+                    </TableCell>
+
+                    {/* Requirement */}
+                    <TableCell>
+                      <p className="max-w-[140px] truncate text-[13px] leading-5 text-[#44556c]">
+                        {line?.requirement || "—"}
+                      </p>
+                    </TableCell>
+
+                    {/* Description */}
+                    <TableCell>
+                      <p className="max-w-[160px] truncate text-[13px] leading-5 text-[#718096]">
+                        {line?.description || "—"}
+                      </p>
+                    </TableCell>
 
                     {/* Loader */}
                     <TableCell>
@@ -186,29 +222,24 @@ const LinesTable = ({
                       {stats.monitor}
                     </TableCell>
 
-                    {/* Requirements */}
-                    <TableCell>
-                      {stats.requirements}
-                    </TableCell>
-
                     {/* Operators */}
                     <TableCell>
                       {stats.operators}
                     </TableCell>
 
                     {/* Actions */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
+                    <td className="px-3 py-3 sm:px-4">
+                      <div className="flex gap-2">
                         {/* Edit */}
                         <button
                           type="button"
                           onClick={() =>
                             onEditLine?.(line)
                           }
-                          className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#f0ecff] text-[#6c4ce8] transition hover:bg-[#e6dfff]"
+                          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-[#f0ecff] text-[#6c4ce8] transition hover:bg-[#e6dfff]"
                           title="Edit Line"
                         >
-                          <Pencil size={13} />
+                          <Pencil size={15} />
                         </button>
 
                         {/* Delete */}
@@ -217,10 +248,10 @@ const LinesTable = ({
                           onClick={() =>
                             onDeleteLine?.(line)
                           }
-                          className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#fff0ee] text-[#e74c3c] transition hover:bg-[#ffe3df]"
+                          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-[#fff0ee] text-[#e74c3c] transition hover:bg-[#ffe3df]"
                           title="Delete Line"
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>
@@ -234,7 +265,7 @@ const LinesTable = ({
 
       {/* Footer */}
       {lines.length > 0 && (
-        <div className="flex items-center justify-between border-t border-[#edf0f3] px-5 py-3">
+        <div className="flex flex-col gap-1.5 border-t border-[#edf0f3] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <p className="text-xs text-[#718096]">
             Total Lines:{" "}
             <span className="font-semibold text-green-600">
@@ -253,7 +284,7 @@ const LinesTable = ({
 
 const TableHeader = ({ children }) => {
   return (
-    <th className="border-r border-[#e1e4e8] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-[#3b4b62] last:border-r-0">
+    <th className="border-r border-[#e1e4e8] px-3 py-3 text-left text-[12px] font-bold uppercase text-[#3b4b62] last:border-r-0 sm:px-4">
       {children}
     </th>
   );
@@ -261,7 +292,7 @@ const TableHeader = ({ children }) => {
 
 const TableCell = ({ children }) => {
   return (
-    <td className="border-r border-[#edf0f2] px-4 py-3 text-[13px] font-medium text-[#44556c] last:border-r-0">
+    <td className="border-r border-[#edf0f2] px-3 py-3 text-[14px] text-[#44556c] last:border-r-0 sm:px-4">
       {children}
     </td>
   );

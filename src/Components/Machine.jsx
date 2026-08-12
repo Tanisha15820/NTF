@@ -1,56 +1,43 @@
-
 import { useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  ArrowLeft,
   Plus,
-  Search,
-  SlidersHorizontal,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
   Cpu,
   Users,
   Activity,
+  Search,
+  Pencil,
+  Trash2,
   X,
 } from "lucide-react";
 import KPICards from "./KPICards";
+import Filters from "./Filters";
+
+const STORAGE_KEY = "lms_departments";
+
+const createId = (prefix) =>
+  `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
 const Machine = () => {
+  const navigate = useNavigate();
+  const { deptId, sectionId, lineId } = useParams();
 
   /* -------------------------------------------------
-     Sample machine data
-     Replace this with your API/localStorage data later
+     State
   ------------------------------------------------- */
-  const [machines, setMachines] = useState([
-    {
-      id: 1,
-      name: "Machine 01",
-      code: "M-001",
-      type: "Loader",
-      operators: 2,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Machine 02",
-      code: "M-002",
-      type: "Monitor",
-      operators: 1,
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Machine 03",
-      code: "M-003",
-      type: "Loader",
-      operators: 2,
-      status: "Inactive",
-    },
-  ]);
-
+  const [storageVersion, setStorageVersion] = useState(0);
   const [search, setSearch] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingMachine, setEditingMachine] = useState(null);
+  const [toast, setToast] = useState("");
+
+  const [filterValues, setFilterValues] = useState({
+    department: "",
+    subDepartment: "",
+    line: "",
+    machine: "",
+  });
 
   const [form, setForm] = useState({
     name: "",
@@ -61,39 +48,78 @@ const Machine = () => {
   });
 
   /* -------------------------------------------------
+     Load current line from localStorage
+  ------------------------------------------------- */
+  const line = useMemo(() => {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+      const dept = data.find((d) => String(d.id) === String(deptId));
+
+      const section = dept?.sections?.find(
+        (s) => String(s.id) === String(sectionId),
+      );
+
+      return (
+        section?.lines?.find(
+          (l) =>
+            String(l.id) === String(lineId) ||
+            String(l.code) === String(lineId),
+        ) || null
+      );
+    } catch (error) {
+      console.error("Unable to load line:", error);
+      return null;
+    }
+  }, [deptId, sectionId, lineId, storageVersion]);
+
+  const machines = useMemo(() => line?.machines || [], [line]);
+
+  /* -------------------------------------------------
      Filter machines
   ------------------------------------------------- */
   const filteredMachines = useMemo(() => {
     const value = search.trim().toLowerCase();
 
-    if (!value) return machines;
+    return machines.filter((machine) => {
+      const matchesSearch =
+        !value ||
+        [machine.name, machine.code, machine.type, machine.status].some(
+          (field) =>
+            String(field || "")
+              .toLowerCase()
+              .includes(value),
+        );
 
-    return machines.filter((machine) =>
-      [
-        machine.name,
-        machine.code,
-        machine.type,
-        machine.status,
-      ].some((field) =>
-        String(field || "")
-          .toLowerCase()
-          .includes(value)
-      )
-    );
-  }, [machines, search]);
+      const matchesType =
+        !filterValues.machine || machine.type === filterValues.machine;
+
+      return matchesSearch && matchesType;
+    });
+  }, [machines, search, filterValues]);
+
+  /* -------------------------------------------------
+     Filter options
+  ------------------------------------------------- */
+  const filterOptions = useMemo(() => {
+    const unique = (list) => [...new Set(list.filter(Boolean))];
+
+    return {
+      types: unique(machines.map((machine) => machine.type)),
+    };
+  }, [machines]);
 
   /* -------------------------------------------------
      Stats
   ------------------------------------------------- */
   const stats = useMemo(() => {
     const active = machines.filter(
-      (machine) => machine.status === "Active"
+      (machine) => machine.status === "Active",
     ).length;
 
     const operators = machines.reduce(
-      (total, machine) =>
-        total + (Number(machine.operators) || 0),
-      0
+      (total, machine) => total + (Number(machine.operators) || 0),
+      0,
     );
 
     return {
@@ -103,6 +129,17 @@ const Machine = () => {
       operators,
     };
   }, [machines]);
+
+  /* -------------------------------------------------
+     Toast
+  ------------------------------------------------- */
+  const showToast = (message) => {
+    setToast(message);
+
+    setTimeout(() => {
+      setToast("");
+    }, 2500);
+  };
 
   /* -------------------------------------------------
      Open Add Modal
@@ -141,52 +178,163 @@ const Machine = () => {
   /* -------------------------------------------------
      Save Machine
   ------------------------------------------------- */
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const saveMachine = () => {
+    if (!line) return;
 
-    if (!form.name.trim()) return;
+    const name = form.name.trim();
+    const code = form.code.trim();
 
-    if (editingMachine) {
-      setMachines((prev) =>
-        prev.map((machine) =>
-          machine.id === editingMachine.id
-            ? {
-                ...machine,
-                ...form,
-                operators: Number(form.operators) || 0,
-              }
-            : machine
-        )
-      );
-    } else {
-      const newMachine = {
-        id: Date.now(),
-        name: form.name.trim(),
-        code: form.code.trim(),
-        type: form.type,
-        operators: Number(form.operators) || 0,
-        status: form.status,
-      };
-
-      setMachines((prev) => [...prev, newMachine]);
+    if (!name) {
+      showToast("Please enter machine name.");
+      return;
     }
 
-    setShowModal(false);
+    if (!code) {
+      showToast("Please enter machine code.");
+      return;
+    }
+
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+      const duplicate = data.some((d) =>
+        (d.sections || []).some((s) =>
+          (s.lines || []).some((l) =>
+            (l.machines || []).some(
+              (m) => String(m.code || "").toLowerCase() === code.toLowerCase(),
+            ),
+          ),
+        ),
+      );
+
+      if (duplicate) {
+        showToast("Machine code already exists.");
+        return;
+      }
+
+      const updatedData = data.map((dept) => {
+        if (String(dept.id) !== String(deptId)) {
+          return dept;
+        }
+
+        return {
+          ...dept,
+          sections: (dept.sections || []).map((section) => {
+            if (String(section.id) !== String(sectionId)) {
+              return section;
+            }
+
+            return {
+              ...section,
+              lines: (section.lines || []).map((currentLine) => {
+                const isTarget =
+                  String(currentLine.id) === String(lineId) ||
+                  String(currentLine.code) === String(lineId);
+
+                if (!isTarget) {
+                  return currentLine;
+                }
+
+                const machine = {
+                  id: createId("machine"),
+                  name,
+                  code,
+                  type: form.type,
+                  operators: Number(form.operators) || 0,
+                  status: form.status,
+                };
+
+                if (editingMachine) {
+                  return {
+                    ...currentLine,
+                    machines: (currentLine.machines || []).map((m) =>
+                      m.id === editingMachine.id ? { ...m, ...machine } : m,
+                    ),
+                  };
+                }
+
+                return {
+                  ...currentLine,
+                  machines: [...(currentLine.machines || []), machine],
+                };
+              }),
+            };
+          }),
+        };
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+
+      setStorageVersion((version) => version + 1);
+
+      setShowModal(false);
+
+      showToast(
+        editingMachine
+          ? "Machine updated successfully."
+          : "Machine created successfully.",
+      );
+    } catch (error) {
+      console.error("Unable to save machine:", error);
+    }
   };
 
   /* -------------------------------------------------
      Delete Machine
   ------------------------------------------------- */
   const handleDelete = (machine) => {
+    if (!line) return;
+
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${machine.name}"?`
+      `Are you sure you want to delete "${machine.name}"?`,
     );
 
     if (!confirmed) return;
 
-    setMachines((prev) =>
-      prev.filter((item) => item.id !== machine.id)
-    );
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+      const updatedData = data.map((dept) => {
+        if (String(dept.id) !== String(deptId)) {
+          return dept;
+        }
+
+        return {
+          ...dept,
+          sections: (dept.sections || []).map((section) => {
+            if (String(section.id) !== String(sectionId)) {
+              return section;
+            }
+
+            return {
+              ...section,
+              lines: (section.lines || []).map((currentLine) => {
+                const isTarget =
+                  String(currentLine.id) === String(lineId) ||
+                  String(currentLine.code) === String(lineId);
+
+                if (!isTarget) {
+                  return currentLine;
+                }
+
+                return {
+                  ...currentLine,
+                  machines: (currentLine.machines || []).filter(
+                    (m) => String(m.id) !== String(machine.id),
+                  ),
+                };
+              }),
+            };
+          }),
+        };
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+
+      setStorageVersion((version) => version + 1);
+    } catch (error) {
+      console.error("Unable to delete machine:", error);
+    }
   };
 
   /* -------------------------------------------------
@@ -219,322 +367,260 @@ const Machine = () => {
     },
   ];
 
-  return (
-    <div className="min-h-screen bg-[#f7f8fb] p-5 md:p-6">
-      {/* =================================================
-          TOP BAR
-      ================================================= */}
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold text-[#26364d]">
-            Machines
-          </h1>
+  /* -------------------------------------------------
+     Line not found
+  ------------------------------------------------- */
+  if (!line) {
+    return (
+      <div className="flex min-h-[calc(100vh-70px)] items-center justify-center bg-[#F5F7FB] text-[#26364d]">
+        <div className="text-center">
+          <h2 className="text-[15px] font-bold text-[#26364d]">
+            Line not found
+          </h2>
 
-          <p className="mt-1 text-[13px] text-[#718096]">
-            Manage machines assigned to this line.
+          <p className="mt-1 text-xs text-[#718096]">
+            The selected line could not be found.
           </p>
+
+          <button
+            onClick={() => navigate(`/lms-section/${deptId}`)}
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#6c4ce8] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5937d1]"
+          >
+            <ArrowLeft size={16} />
+            Back to Section
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={openAddModal}
-          className="flex items-center gap-2 rounded-lg bg-[#6F4AE7] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#5A38D6]"
-        >
-          <Plus size={15} />
-          Add Machine
-        </button>
       </div>
+    );
+  }
 
-      {/* =================================================
-          KPI CARDS
-      ================================================= */}
-      <div className="mb-5">
-        <KPICards data={kpiData} />
-      </div>
-
-      {/* =================================================
-          MAIN TABLE CARD
-      ================================================= */}
-      <div className="overflow-hidden rounded-[14px] border border-[#e3e6eb] bg-white">
-        {/* Table Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf0f3] px-5 py-4">
-          <div>
-            <h2 className="text-[14px] font-bold text-[#26364d]">
-              Machines in this Line
-            </h2>
-
-            <p className="mt-0.5 text-xs text-[#718096]">
-              {machines.length} machine
-              {machines.length !== 1 ? "s" : ""} assigned
-              to this line
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Search */}
-            <div className="relative">
-              <Search
-                size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aa3af]"
-              />
-
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search machine..."
-                className="h-9 w-[210px] rounded-lg border border-[#e1e5eb] bg-white pl-9 pr-3 text-xs text-[#344760] outline-none transition placeholder:text-[#a0a8b4] focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/10"
-              />
-            </div>
-
-            {/* Filter */}
-            <button
-              type="button"
-              onClick={() =>
-                setShowFilters((prev) => !prev)
-              }
-              className={`flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition ${
-                showFilters
-                  ? "border-[#6F4AE7] bg-[#f0ecff] text-[#6F4AE7]"
-                  : "border-[#e1e5eb] text-[#596579] hover:bg-[#f7f8fb]"
-              }`}
-            >
-              <SlidersHorizontal size={14} />
-              Filter
-            </button>
-          </div>
-        </div>
-
-        {/* Filter Bar */}
-        {showFilters && (
-          <div className="flex flex-wrap items-center gap-2 border-b border-[#edf0f3] bg-[#fafbfc] px-5 py-3">
-            <span className="text-xs font-semibold text-[#596579]">
-              Machine Type:
-            </span>
-
-            <button
-              type="button"
-              className="rounded-full bg-[#f0ecff] px-3 py-1 text-[11px] font-semibold text-[#6F4AE7]"
-            >
-              All
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSearch("Loader")}
-              className="rounded-full border border-[#e3e6eb] bg-white px-3 py-1 text-[11px] font-medium text-[#596579] hover:border-[#6F4AE7] hover:text-[#6F4AE7]"
-            >
-              Loader
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSearch("Monitor")}
-              className="rounded-full border border-[#e3e6eb] bg-white px-3 py-1 text-[11px] font-medium text-[#596579] hover:border-[#6F4AE7] hover:text-[#6F4AE7]"
-            >
-              Monitor
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSearch("")}
-              className="ml-auto text-xs font-semibold text-[#6F4AE7] hover:underline"
-            >
-              Clear
-            </button>
-          </div>
-        )}
-
-        {/* Table */}
-        <div className="overflow-x-auto p-3">
-          {filteredMachines.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-14">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#f0ecff] text-[#6F4AE7]">
-                <Cpu size={22} />
+  return (
+    <div className="text-[#26364d]">
+      <section className="p-[30px_25px]">
+        <div className="overflow-hidden rounded-[17px] border border-[#e3e6eb] bg-white shadow-sm">
+          {/* =====================================================
+              HEADER
+          ===================================================== */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#edf0f3] px-5 py-[18px]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-[45px] w-[45px] items-center justify-center rounded-xl bg-gradient-to-br from-[#6c4ce8] to-[#8b6ffe] text-white shadow-md shadow-[#6c4ce8]/30">
+                <Cpu size={21} />
               </div>
 
-              <h3 className="text-sm font-semibold text-[#344760]">
-                No machines found
-              </h3>
+              <div>
+                <h1 className="mt-0.5 text-[18px] font-bold leading-5 text-[#26364d]">
+                  {line.name}
+                </h1>
 
-              <p className="mt-1 text-xs text-[#8a95a5]">
-                {search
-                  ? "Try changing your search."
-                  : "Add a machine to this line."}
-              </p>
-
-              {!search && (
-                <button
-                  type="button"
-                  onClick={openAddModal}
-                  className="mt-3 text-xs font-semibold text-[#6F4AE7] hover:underline"
-                >
-                  + Add your first machine
-                </button>
-              )}
+                <p className="mt-0.5 text-xs text-[#718096]">
+                  Manage machines within this line
+                </p>
+              </div>
             </div>
-          ) : (
-            <table className="w-full min-w-[800px] border-collapse overflow-hidden rounded-lg">
-              <thead>
-                <tr className="bg-[#f5f6f8]">
-                  <TableHeader>Machine Name</TableHeader>
-                  <TableHeader>Code</TableHeader>
-                  <TableHeader>Type</TableHeader>
-                  <TableHeader>Operators</TableHeader>
-                  <TableHeader>Status</TableHeader>
-                  <TableHeader>Actions</TableHeader>
-                </tr>
-              </thead>
 
-              <tbody>
-                {filteredMachines.map(
-                  (machine, index) => (
-                    <tr
-                      key={`${machine.id}-${index}`}
-                      className="border-b border-[#edf0f2] bg-white last:border-0 hover:bg-[#fafaff]"
-                    >
-                      {/* Name */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f0ecff] text-[#6F4AE7]">
-                            <Cpu size={16} />
-                          </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate(`/lms-section/${deptId}`)}
+                className="flex h-[38px] items-center gap-1.5 rounded-lg border border-[#e3e6eb] bg-white px-4 text-xs font-semibold text-[#718096] transition hover:bg-[#f7f8fa]"
+              >
+                <ArrowLeft size={15} />
+                Back to Section
+              </button>
 
-                          <div>
-                            <p className="text-[13px] font-semibold text-[#344760]">
-                              {machine.name}
-                            </p>
+              <button
+                onClick={openAddModal}
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6c4ce8] to-[#8b6ffe] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-[#6c4ce8]/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#6c4ce8]/30"
+              >
+                <Plus size={15} />
+                Add Machine
+              </button>
+            </div>
+          </div>
 
-                            <p className="mt-0.5 text-[11px] text-[#8a95a5]">
-                              Machine #{index + 1}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
+          {/* =====================================================
+              FILTERS
+          ===================================================== */}
+          <div className="m-5">
+            <Filters
+              values={filterValues}
+              onChange={setFilterValues}
+              departmentOptions={[]}
+              subDepartmentOptions={[]}
+              lineOptions={[]}
+              machineOptions={filterOptions.types}
+              machineLabel="Machine Type"
+              showDates={true}
+            />
+          </div>
 
-                      {/* Code */}
-                      <TableCell>
-                        {machine.code || "—"}
-                      </TableCell>
+          {/* =====================================================
+              KPI CARDS
+          ===================================================== */}
+          <div className="mx-5 mb-5">
+            <KPICards data={kpiData} />
+          </div>
 
-                      {/* Type */}
-                      <td className="border-r border-[#edf0f2] px-4 py-3">
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${
-                            machine.type
-                              ?.toLowerCase() ===
-                            "loader"
-                              ? "bg-[#f0ecff] text-[#6F4AE7]"
-                              : "bg-[#eef7ff] text-[#3182ce]"
-                          }`}
-                        >
-                          {machine.type}
-                        </span>
-                      </td>
+          {/* =====================================================
+              MACHINE TABLE
+          ===================================================== */}
 
-                      {/* Operators */}
-                      <TableCell>
-                        {machine.operators || 0}
-                      </TableCell>
+          <div className="mx-5 mb-5 overflow-hidden rounded-[14px] border border-[#e3e6eb]">
+            {/* TABLE HEADER */}
 
-                      {/* Status */}
-                      <td className="border-r border-[#edf0f2] px-4 py-3">
-                        <span
-                          className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${
-                            machine.status === "Active"
-                              ? "text-[#16a34a]"
-                              : "text-[#e74c3c]"
-                          }`}
-                        >
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              machine.status ===
-                              "Active"
-                                ? "bg-[#16a34a]"
-                                : "bg-[#e74c3c]"
-                            }`}
-                          />
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf0f3] px-5 py-[18px]">
+              <div>
+                <h2 className="text-[18px] font-bold text-[#26364d]">
+                  Machines in this Line
+                </h2>
+              </div>
 
-                          {machine.status}
-                        </span>
-                      </td>
+              <div className="relative w-full sm:w-[260px]">
+                <Search
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aa3af]"
+                />
 
-                      {/* Actions */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openEditModal(machine)
-                            }
-                            title="Edit Machine"
-                            className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#f0ecff] text-[#6F4AE7] transition hover:bg-[#e6dfff]"
-                          >
-                            <Pencil size={13} />
-                          </button>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search machines..."
+                  className="h-9 w-full rounded-lg border border-[#d5d9df] bg-[#f7f8fa] pl-9 pr-3 text-[13px] text-[#26364d] outline-none transition placeholder:text-[#9aa3af] focus:border-[#6c4ce8] focus:bg-white"
+                />
+              </div>
+            </div>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDelete(machine)
-                            }
-                            title="Delete Machine"
-                            className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#fff0ee] text-[#e74c3c] transition hover:bg-[#ffe3df]"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+            {/* TABLE */}
 
-                          <button
-                            type="button"
-                            title="More"
-                            className="flex h-[30px] w-[30px] items-center justify-center rounded-lg text-[#718096] transition hover:bg-[#f5f6f8]"
-                          >
-                            <MoreHorizontal size={15} />
-                          </button>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[800px] border-collapse">
+                <thead>
+                  <tr className="bg-[#f5f6f8]">
+                    <TableHeader>Machine Name</TableHeader>
+                    <TableHeader>Code</TableHeader>
+                    <TableHeader>Type</TableHeader>
+                    <TableHeader>Operators</TableHeader>
+                    <TableHeader>Status</TableHeader>
+                    <TableHeader>Actions</TableHeader>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredMachines.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-0">
+                        <div className="flex flex-col items-center justify-center py-16 text-[#9aa3af]">
+                          <p className="text-[14px] font-semibold text-[#26364d]">
+                            No machines found
+                          </p>
+
+                          <p className="mt-1 text-[13px] text-[#718096]">
+                            Try changing your search or filter.
+                          </p>
                         </div>
                       </td>
                     </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
+                  ) : (
+                    filteredMachines.map((machine, index) => (
+                      <tr
+                        key={`${machine.id}-${index}`}
+                        className="group border-b border-[#edf0f2] last:border-0 hover:bg-[#fafaff]"
+                      >
+                        {/* NAME */}
 
-        {/* Footer */}
-        {machines.length > 0 && (
-          <div className="flex items-center justify-between border-t border-[#edf0f3] px-5 py-3">
-            <p className="text-xs text-[#718096]">
-              Total Machines:{" "}
-              <span className="font-semibold text-[#6F4AE7]">
-                {machines.length}
-              </span>
-            </p>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <p className="text-[14px] text-[#344760]">
+                                {machine.name}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
 
-            <p className="text-xs text-green-600">
-              {stats.active} active machine
-              {stats.active !== 1 ? "s" : ""}
-            </p>
+                        {/* CODE */}
+
+                        <TableCell>{machine.code || "—"}</TableCell>
+
+                        {/* TYPE */}
+
+                        <TableCell>
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                              machine.type?.toLowerCase() === "loader"
+                                ? "bg-[#f0ecff] text-[#6c4ce8]"
+                                : "bg-[#eef7ff] text-[#3182ce]"
+                            }`}
+                          >
+                            {machine.type}
+                          </span>
+                        </TableCell>
+
+                        {/* OPERATORS */}
+
+                        <TableCell>{machine.operators || 0}</TableCell>
+
+                        {/* STATUS */}
+
+                        <TableCell>
+                          <StatusBadge status={machine.status} />
+                        </TableCell>
+
+                        {/* ACTIONS */}
+
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => openEditModal(machine)}
+                              className="flex h-[34px] w-[34px] items-center justify-center rounded-lg bg-[#f0ecff] text-[#6c4ce8] transition hover:bg-[#e6dfff]"
+                              title="Edit machine"
+                            >
+                              <Pencil size={15} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(machine)}
+                              className="flex h-[34px] w-[34px] items-center justify-center rounded-lg bg-[#fff0ee] text-[#e74c3c] transition hover:bg-[#ffe3df]"
+                              title="Delete machine"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      </section>
 
       {/* =================================================
           ADD / EDIT MACHINE MODAL
       ================================================= */}
+
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#111827]/40 px-4 backdrop-blur-[2px]">
-          <div className="w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div
+          className="fixed inset-0 z-[500] flex items-center justify-center bg-[#141928]/50 p-5"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setShowModal(false);
+            }
+          }}
+        >
+          <div className="w-full max-w-[520px] overflow-hidden rounded-[17px] bg-white shadow-2xl">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-[#edf0f3] px-5 py-4">
+            <div className="flex items-center justify-between border-b border-[#e3e6eb] px-5 py-[18px]">
               <div>
                 <h2 className="text-[15px] font-bold text-[#26364d]">
-                  {editingMachine
-                    ? "Edit Machine"
-                    : "Add Machine"}
+                  {editingMachine ? "Edit Machine" : "Add Machine"}
                 </h2>
 
-                <p className="mt-0.5 text-xs text-[#8a95a5]">
+                <p className="mt-0.5 text-xs text-[#718096]">
                   {editingMachine
                     ? "Update machine details."
                     : "Add a new machine to this line."}
@@ -546,16 +632,22 @@ const Machine = () => {
                 onClick={() => setShowModal(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-[#718096] transition hover:bg-[#f5f6f8] hover:text-[#344760]"
               >
-                <X size={17} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4 px-5 py-5">
+            <div className="max-h-[65vh] overflow-y-auto p-5">
+              <div className="space-y-5">
                 {/* Machine Name */}
-                <FormField label="Machine Name" required>
+                <div>
+                  <label className="mb-2 block text-xs font-semibold text-[#26364d]">
+                    Machine Name
+                    <span className="ml-1 text-[#e74c3c]">*</span>
+                  </label>
+
                   <input
+                    autoFocus
                     type="text"
                     value={form.name}
                     onChange={(e) =>
@@ -565,13 +657,17 @@ const Machine = () => {
                       }))
                     }
                     placeholder="Enter machine name"
-                    className="form-input"
-                    required
+                    className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm text-[#26364d] outline-none transition focus:border-[#6c4ce8]"
                   />
-                </FormField>
+                </div>
 
                 {/* Code */}
-                <FormField label="Machine Code">
+                <div>
+                  <label className="mb-2 block text-xs font-semibold text-[#26364d]">
+                    Machine Code
+                    <span className="ml-1 text-[#e74c3c]">*</span>
+                  </label>
+
                   <input
                     type="text"
                     value={form.code}
@@ -582,13 +678,17 @@ const Machine = () => {
                       }))
                     }
                     placeholder="e.g. M-001"
-                    className="form-input"
+                    className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm text-[#26364d] outline-none transition focus:border-[#6c4ce8]"
                   />
-                </FormField>
+                </div>
 
                 {/* Type + Operators */}
                 <div className="grid grid-cols-2 gap-3">
-                  <FormField label="Machine Type">
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold text-[#26364d]">
+                      Machine Type
+                    </label>
+
                     <select
                       value={form.type}
                       onChange={(e) =>
@@ -597,21 +697,19 @@ const Machine = () => {
                           type: e.target.value,
                         }))
                       }
-                      className="form-input"
+                      className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm text-[#26364d] outline-none transition focus:border-[#6c4ce8]"
                     >
-                      <option value="Loader">
-                        Loader
-                      </option>
-                      <option value="Monitor">
-                        Monitor
-                      </option>
-                      <option value="Other">
-                        Other
-                      </option>
+                      <option value="Loader">Loader</option>
+                      <option value="Monitor">Monitor</option>
+                      <option value="Other">Other</option>
                     </select>
-                  </FormField>
+                  </div>
 
-                  <FormField label="Operators">
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold text-[#26364d]">
+                      Operators
+                    </label>
+
                     <input
                       type="number"
                       min="0"
@@ -622,13 +720,17 @@ const Machine = () => {
                           operators: e.target.value,
                         }))
                       }
-                      className="form-input"
+                      className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm text-[#26364d] outline-none transition focus:border-[#6c4ce8]"
                     />
-                  </FormField>
+                  </div>
                 </div>
 
                 {/* Status */}
-                <FormField label="Status">
+                <div>
+                  <label className="mb-2 block text-xs font-semibold text-[#26364d]">
+                    Status
+                  </label>
+
                   <select
                     value={form.status}
                     onChange={(e) =>
@@ -637,39 +739,44 @@ const Machine = () => {
                         status: e.target.value,
                       }))
                     }
-                    className="form-input"
+                    className="h-11 w-full rounded-lg border border-[#d5d9df] px-3 text-sm text-[#26364d] outline-none transition focus:border-[#6c4ce8]"
                   >
-                    <option value="Active">
-                      Active
-                    </option>
-                    <option value="Inactive">
-                      Inactive
-                    </option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
                   </select>
-                </FormField>
+                </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-2 border-t border-[#edf0f3] bg-[#fafbfc] px-5 py-3">
+              <div className="mt-6 flex justify-end gap-2 border-t border-[#e3e6eb] pt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="rounded-lg border border-[#e1e5eb] bg-white px-4 py-2.5 text-xs font-semibold text-[#596579] transition hover:bg-[#f5f6f8]"
+                  className="rounded-lg bg-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-200"
                 >
                   Cancel
                 </button>
 
                 <button
-                  type="submit"
-                  className="rounded-lg bg-[#6F4AE7] px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5A38D6]"
+                  type="button"
+                  onClick={saveMachine}
+                  className="rounded-lg bg-[#6c4ce8] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#5937d1]"
                 >
-                  {editingMachine
-                    ? "Save Changes"
-                    : "Add Machine"}
+                  {editingMachine ? "Save Changes" : "Create Machine"}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
+        </div>
+      )}
+
+      {/* =====================================================
+          TOAST
+      ===================================================== */}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[1000] rounded-lg border-l-4 border-[#10b981] bg-[#202938] px-5 py-3 text-xs font-medium text-white shadow-xl">
+          {toast}
         </div>
       )}
     </div>
@@ -682,7 +789,7 @@ const Machine = () => {
 
 const TableHeader = ({ children }) => {
   return (
-    <th className="border-r border-[#e1e4e8] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-[#3b4b62] last:border-r-0">
+    <th className="border-r border-[#e1e4e8] px-4 py-3 text-left text-[12px] font-bold uppercase text-[#3b4b62] last:border-r-0">
       {children}
     </th>
   );
@@ -694,30 +801,34 @@ const TableHeader = ({ children }) => {
 
 const TableCell = ({ children }) => {
   return (
-    <td className="border-r border-[#edf0f2] px-4 py-3 text-[13px] font-medium text-[#44556c] last:border-r-0">
+    <td className="border-r border-[#edf0f2] px-4 py-3 text-[14px] text-[#44556c] last:border-r-0">
       {children}
     </td>
   );
 };
 
 /* =====================================================
-   FORM FIELD
+   STATUS BADGE
 ===================================================== */
 
-const FormField = ({ label, required, children }) => {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-[#596579]">
-        {label}
-        {required && (
-          <span className="ml-1 text-[#e74c3c]">*</span>
-        )}
-      </span>
+const StatusBadge = ({ status }) => {
+  const isActive = status?.toLowerCase() === "active";
 
-      {children}
-    </label>
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold ${
+        isActive ? "bg-green-100 text-green-600" : "bg-[#f5f6f8] text-[#718096]"
+      }`}
+    >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${
+          isActive ? "bg-green-600" : "bg-[#9aa3af]"
+        }`}
+      />
+
+      {isActive ? "Active" : "Inactive"}
+    </span>
   );
 };
 
 export default Machine;
-
