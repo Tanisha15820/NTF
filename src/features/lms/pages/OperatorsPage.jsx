@@ -3,7 +3,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltRounded";
-// import Sidebar from "../../../components/Sidebar";
+import Sidebar from "../../../components/Sidebar";
 import Navbar from "../../../components/Navbar";
 import KPICards from "../../../components/KPICards";
 import { lmsMenus } from "../data/LMSMenu";
@@ -44,7 +44,7 @@ const OperatorsPage = () => {
 
   return (
     <div className="flex h-screen bg-[#F5F7FB] overflow-hidden">
-      {/* <Sidebar
+      <Sidebar
         menuItems={lmsMenus}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
@@ -52,7 +52,7 @@ const OperatorsPage = () => {
         setCollapsed={setCollapsed}
         activeMenu={activeMenu}
         setActiveMenu={setActiveMenu}
-      /> */}
+      />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="sticky top-0 z-30 bg-white shadow-sm">
