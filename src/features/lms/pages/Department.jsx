@@ -1,6 +1,6 @@
 import { useState } from "react";
 // import Sidebar from "../../../components/Sidebar";
-import Navbar from "../../../components/Navbar";
+// import Navbar from "../../../components/Navbar";
 import Department from "../components/Department";
 import { lmsMenus } from "../data/LMSMenu";
 
@@ -29,7 +29,7 @@ const DepartmentPage = () => {
         {/* NAVBAR */}
 
         <div className="sticky top-0 z-30 bg-white shadow-sm">
-          <Navbar setMobileOpen={setMobileOpen} activeMenu={activeMenu} />
+          {/* <Navbar setMobileOpen={setMobileOpen} activeMenu={activeMenu} /> */}
         </div>
 
         {/* PAGE */}
