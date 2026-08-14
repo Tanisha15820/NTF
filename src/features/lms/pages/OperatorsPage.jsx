@@ -8,8 +8,8 @@ import Navbar from "../../../components/Navbar";
 import KPICards from "../../../components/KPICards";
 import LMSTabs from "../components/LMSTabs";
 import { lmsMenus } from "../data/LMSMenu";
-import Filters from "../../../Components/Filters";
 import Operators from "../components/Operators";
+import OperatorLevels from "../components/OperatorLevels";
 
 const kpiData = [
   {
@@ -77,11 +77,7 @@ const OperatorsPage = () => {
             </>
           )}
 
-          {activeTab === "Operator Levels" && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6">
-              Operator Levels
-            </div>
-          )}
+          {activeTab === "Operator Levels" && <OperatorLevels />}
         </main>
       </div>
     </div>
