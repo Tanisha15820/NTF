@@ -341,27 +341,7 @@ const QuestionPaperPreview = ({ level = "L0" }) => {
               })
             )}
 
-            {/* ── Footer Signature Strip ── */}
-            {totalQuestions > 0 && (
-              <div className="pt-8 border-t border-gray-300 grid grid-cols-3 gap-6 text-[11px] text-gray-700">
-                <div>
-                  <span className="block font-bold text-gray-900 mb-1">Candidate Signature:</span>
-                  <div className="h-8 border-b border-dashed border-gray-400" />
-                </div>
-                <div>
-                  <span className="block font-bold text-gray-900 mb-1">Invigilator Signature:</span>
-                  <div className="h-8 border-b border-dashed border-gray-400" />
-                </div>
-                <div>
-                  <span className="block font-bold text-gray-900 mb-1">Marks Obtained:</span>
-                  <div className="h-8 border-b border-dashed border-gray-400 flex items-end justify-end font-bold text-gray-900">
-                    / {totalMarks}
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>
+            </div>
         </div>
       </div>
 
