@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import Sidebar from "../../../components/Sidebar";
+import Sidebar from "../../../components/Sidebar";
 import Navbar from "../../../components/Navbar";
 import QuestionPaperTable from "../components/QuestionPaperTable";
 import LMSTabs from "../components/LMSTabs";
@@ -36,7 +36,7 @@ const LMS = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* <Sidebar
+      <Sidebar
         menuItems={lmsMenus}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
@@ -44,7 +44,7 @@ const LMS = () => {
         setCollapsed={setCollapsed}
         activeMenu={activeMenu}
         setActiveMenu={setActiveMenu}
-      /> */}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="sticky top-0 z-30 bg-white shadow-sm">
