@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-
+import TextField from "@mui/material/TextField";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,9 +13,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
 import { Bar } from "react-chartjs-2";
-import TextField from "@mui/material/TextField";
+import {
+  CHART_COLORS,
+  getBarChartOptions,
+  createBarDataset,
+} from "../../../utils/chartConfig";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -41,90 +44,52 @@ const labels = [
 const chartData = {
   labels,
   datasets: [
-    {
+    createBarDataset({
       label: "Joined",
       data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      backgroundColor: "#258e92",
+      color: CHART_COLORS.primary,
       borderRadius: 0,
-      borderSkipped: false,
-      barThickness: 20,
-    },
-    {
+      barThickness: 24,
+    }),
+    createBarDataset({
       label: "Trained",
       data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      backgroundColor: "#f0a128",
+      color: CHART_COLORS.success,
       borderRadius: 0,
-      borderSkipped: false,
-      barThickness: 20,
-    },
+      barThickness: 24,
+    }),
   ],
 };
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
+const options = getBarChartOptions({
+  yStepSize: 20,
+});
 
-  animation: {
-    duration: 700,
-  },
-
-  plugins: {
-    legend: {
-      position: "top",
-      align: "end",
-
-      labels: {
-        usePointStyle: true,
-        pointStyle: "circle",
-        padding: 25,
-        boxWidth: 10,
-        boxHeight: 10,
-
-        color: "#374151",
-
-        font: {
-          size: 13,
-          weight: "600",
-        },
-      },
+const filterInputSx = {
+  "& .MuiOutlinedInput-root": {
+    height: "36px",
+    borderRadius: "10px",
+    backgroundColor: "#fff",
+    fontSize: "13px",
+    color: "#334155",
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#C7D2FE",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#6F4AE7",
     },
   },
-
-  scales: {
-    x: {
-      grid: {
-        display: false,
-        drawBorder: false,
-        drawTicks: false,
-      },
-
-      border: {
-        display: false,
-      },
-
-      ticks: {
-        color: "#6B7280",
-      },
+  "& .MuiInputLabel-root": {
+    fontSize: "13px",
+    color: "#64748B",
+    lineHeight: "1.2",
+    "&.Mui-focused": {
+      color: "#6F4AE7",
     },
-
-    y: {
-      beginAtZero: true,
-
-      grid: {
-        display: false,
-        drawBorder: false,
-        drawTicks: false,
-      },
-
-      border: {
-        display: false,
-      },
-
-      ticks: {
-        stepSize: 20,
-        color: "#6B7280",
-      },
-    },
+  },
+  "& .MuiSelect-select": {
+    padding: "7px 12px",
+    fontSize: "13px",
   },
 };
 
@@ -135,94 +100,51 @@ const OperatorTraining = () => {
   const [shift, setShift] = useState("");
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
-      <div className="flex items-center gap-4 mb-4">
-        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <PeopleAltIcon
-            sx={{
-              color: "#6F4AE7",
-              fontSize: 20,
-            }}
-          />
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="h-11 w-11 rounded-xl bg-[#F3EEFF] text-[#6F4AE7] flex items-center justify-center shadow-xs">
+            <PeopleAltIcon sx={{ fontSize: 22 }} />
+          </div>
+
+          <div>
+            <h2 className="text-base font-bold text-slate-800 tracking-tight">
+              Operator Training - Joined VS Trained
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Deployed headcount with day-over-day movement
+            </p>
+          </div>
         </div>
 
-        <div>
-          <h1 className="text-sm font-bold text-gray-800">
-            Operator Training - Joined VS Trained
-          </h1>
-          <p className="text-xs text-gray-500">
-            Deployed headcount with day-over-day movement
-          </p>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F3EEFF] text-[#6F4AE7] border border-[#E5DCFF]">
+            Training Completion: 78.4%
+          </span>
         </div>
       </div>
 
-      {/* Filters */}
-
-      <div className="mb-4">
-        <h2 className="text-base font-semibold text-gray-800 mb-3">Filters</h2>
-
-        <div className="grid xl:grid-cols-6 md:grid-cols-3 grid-cols-1 gap-3">
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "32px",
-                borderRadius: "10px",
-                backgroundColor: "#fff",
-                fontSize: "14px",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px",
-              },
-            }}
-          >
+      {/* Embedded Filters Grid */}
+      <div className="bg-slate-50/70 rounded-xl p-3 mb-5 border border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <FormControl fullWidth size="small" sx={filterInputSx}>
             <InputLabel>Department</InputLabel>
-
             <Select
               value={department}
               label="Department"
               onChange={(e) => setDepartment(e.target.value)}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    "& .MuiMenuItem-root": {
-                      fontSize: "13px", // Dropdown options
-                      minHeight: "34px",
-                    },
-                  },
-                },
-              }}
             >
               <MenuItem value="">
                 <em>All</em>
               </MenuItem>
-
               <MenuItem value="Assembly">Assembly</MenuItem>
               <MenuItem value="Production">Production</MenuItem>
               <MenuItem value="Quality">Quality</MenuItem>
             </Select>
           </FormControl>
 
-          {/* Sub Department */}
-
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "32px",
-                borderRadius: "10px",
-                backgroundColor: "#fff",
-                fontSize: "14px",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px",
-              },
-            }}
-          >
+          <FormControl fullWidth size="small" sx={filterInputSx}>
             <InputLabel>Sub Department</InputLabel>
-
             <Select
               value={subDepartment}
               label="Sub Department"
@@ -231,31 +153,13 @@ const OperatorTraining = () => {
               <MenuItem value="">
                 <em>All</em>
               </MenuItem>
-
               <MenuItem value="Sub 1">Sub 1</MenuItem>
               <MenuItem value="Sub 2">Sub 2</MenuItem>
             </Select>
           </FormControl>
 
-          {/* Line */}
-
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "32px",
-                borderRadius: "10px",
-                backgroundColor: "#fff",
-                fontSize: "14px",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px",
-              },
-            }}
-          >
+          <FormControl fullWidth size="small" sx={filterInputSx}>
             <InputLabel>Line</InputLabel>
-
             <Select
               value={line}
               label="Line"
@@ -264,32 +168,14 @@ const OperatorTraining = () => {
               <MenuItem value="">
                 <em>All</em>
               </MenuItem>
-
               <MenuItem value="Line 1">Line 1</MenuItem>
               <MenuItem value="Line 2">Line 2</MenuItem>
               <MenuItem value="Line 3">Line 3</MenuItem>
             </Select>
           </FormControl>
 
-          {/* Shift */}
-
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "32px",
-                borderRadius: "10px",
-                backgroundColor: "#fff",
-                fontSize: "14px",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px",
-              },
-            }}
-          >
+          <FormControl fullWidth size="small" sx={filterInputSx}>
             <InputLabel>Shift</InputLabel>
-
             <Select
               value={shift}
               label="Shift"
@@ -298,14 +184,11 @@ const OperatorTraining = () => {
               <MenuItem value="">
                 <em>All</em>
               </MenuItem>
-
               <MenuItem value="Morning">Morning</MenuItem>
               <MenuItem value="Evening">Evening</MenuItem>
               <MenuItem value="Night">Night</MenuItem>
             </Select>
           </FormControl>
-
-          {/* From Date */}
 
           <TextField
             fullWidth
@@ -313,22 +196,13 @@ const OperatorTraining = () => {
             label="From Date"
             type="date"
             slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
+              inputLabel: { shrink: true },
             }}
             sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "32px",
-                borderRadius: "10px",
-                fontSize: "14px",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px",
-              },
-              "& input": {
-                fontSize: "14px",
-                padding: "6px 12px",
+              ...filterInputSx,
+              "& .MuiOutlinedInput-input": {
+                padding: "7px 12px",
+                fontSize: "13px",
               },
             }}
           />
@@ -339,31 +213,22 @@ const OperatorTraining = () => {
             label="To Date"
             type="date"
             slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
+              inputLabel: { shrink: true },
             }}
             sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "32px",
-                borderRadius: "10px",
-                fontSize: "14px",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "14px",
-              },
-              "& input": {
-                fontSize: "14px",
-                padding: "6px 12px",
+              ...filterInputSx,
+              "& .MuiOutlinedInput-input": {
+                padding: "7px 12px",
+                fontSize: "13px",
               },
             }}
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto custom-chart-scrollbar pb-2">
         <div
-          className="h-[200px]"
+          className="h-[240px]"
           style={{
             minWidth: "1600px",
           }}
@@ -376,3 +241,4 @@ const OperatorTraining = () => {
 };
 
 export default OperatorTraining;
+

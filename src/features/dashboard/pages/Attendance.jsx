@@ -27,7 +27,7 @@ const Attendance = () => {
           <Navbar setMobileOpen={setMobileOpen} activeMenu={activeMenu} />
         </div>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto px-6 pt-5 pb-8 space-y-6">
           <Filters />
           <AttendanceTable />
         </main>

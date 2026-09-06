@@ -12,9 +12,7 @@ const OperatorProfile = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("Operators");
-
   const [operators] = useLocalStorage(OPERATORS_STORAGE_KEY, SEED_OPERATORS);
-
   const found = operators.find((item) => item.id === id);
 
   const operator = found

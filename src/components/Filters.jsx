@@ -1,22 +1,83 @@
 import { useState } from "react";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 
-const inputSx = {
+const selectSx = {
   "& .MuiOutlinedInput-root": {
-    height: "32px",
+    height: "44px",
     borderRadius: "10px",
     backgroundColor: "#fff",
-    fontSize: "14px",
+    fontSize: "15px",
+    color: "#475569",
   },
-  "& .MuiOutlinedInput-input": {
-    padding: "6px 12px",
+
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#D9E0E8",
   },
+
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#C7D2FE",
+  },
+
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#7C5CFC",
+  },
+
+  "& .MuiSelect-select": {
+    display: "flex",
+    alignItems: "center",
+    height: "44px",
+    boxSizing: "border-box",
+    padding: "0 40px 0 14px",
+    fontSize: "15px",
+  },
+
+  "& .MuiSelect-icon": {
+    right: "10px",
+    color: "#64748B",
+  },
+};
+
+const dateSx = {
+  "& .MuiOutlinedInput-root": {
+    height: "44px",
+    borderRadius: "10px",
+    backgroundColor: "#fff",
+    fontSize: "15px",
+    color: "#475569",
+  },
+
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#D9E0E8",
+  },
+
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#C7D2FE",
+  },
+
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#7C5CFC",
+  },
+
   "& .MuiInputLabel-root": {
-    fontSize: "14px",
+    fontSize: "12px",
+    color: "#64748B",
+  },
+
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#64748B",
+  },
+
+  "& .MuiOutlinedInput-input": {
+    padding: "9px 12px",
+    fontSize: "15px",
+  },
+
+  "& input::-webkit-calendar-picker-indicator": {
+    cursor: "pointer",
   },
 };
 
@@ -24,8 +85,9 @@ const menuProps = {
   PaperProps: {
     sx: {
       "& .MuiMenuItem-root": {
-        fontSize: "13px",
-        minHeight: "34px",
+        fontSize: "15px",
+        minHeight: "38px",
+        padding: "9px 14px",
       },
     },
   },
@@ -34,10 +96,12 @@ const menuProps = {
 const Filters = ({
   values: externalValues,
   onChange: externalOnChange,
+
   departmentOptions = ["Assembly", "Production", "Quality"],
   subDepartmentOptions = ["Sub 1", "Sub 2"],
   lineOptions = ["Line 1", "Line 2", "Line 3"],
   machineOptions = ["Machine 1", "Machine 2", "Machine 3"],
+
   machineLabel = "Shift",
   showDates = true,
 }) => {
@@ -53,151 +117,180 @@ const Filters = ({
   const values = externalValues ?? internalValues;
 
   const updateValue = (key) => (event) => {
-    const next = { ...values, [key]: event.target.value };
+    const nextValues = {
+      ...values,
+      [key]: event.target.value,
+    };
 
     if (externalOnChange) {
-      externalOnChange(next);
+      externalOnChange(nextValues);
     } else {
-      setInternalValues(next);
+      setInternalValues(nextValues);
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 mb-4">
-      <h2 className="text-sm font-semibold text-gray-800 mb-3">Filters</h2>
+    <div className="mb-4 w-full rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-sm">
+      <div className="flex w-full flex-wrap items-center gap-3">
+        {/* Filter */}
+        <div className="flex h-[44px] shrink-0 items-center gap-2 px-1">
+          <FilterAltOutlinedIcon
+            sx={{
+              fontSize: 22,
+              color: "#334155",
+            }}
+          />
 
-      <div className="grid xl:grid-cols-6 md:grid-cols-3 grid-cols-1 gap-3">
-        <FormControl fullWidth size="small" sx={inputSx}>
-          <InputLabel>Department</InputLabel>
+          <span className="whitespace-nowrap text-[15px] font-semibold text-[#334155]">
+            Filters
+          </span>
+        </div>
 
-          <Select
-            value={values.department}
-            label="Department"
-            onChange={updateValue("department")}
-            MenuProps={menuProps}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
+        {/* Department */}
+        <div className="w-full sm:w-[150px] lg:flex-1">
+          <FormControl fullWidth size="small" sx={selectSx}>
+            <Select
+              value={values.department}
+              displayEmpty
+              onChange={updateValue("department")}
+              MenuProps={menuProps}
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span className="text-[#475569]">Department</span>;
+                }
 
-            {departmentOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+                return selected;
+              }}
+            >
+              <MenuItem value="">All Departments</MenuItem>
 
-        <FormControl fullWidth size="small" sx={inputSx}>
-          <InputLabel>Sub Department</InputLabel>
+              {departmentOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
 
-          <Select
-            value={values.subDepartment}
-            label="Sub Department"
-            onChange={updateValue("subDepartment")}
-            MenuProps={menuProps}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
+        {/* Sub Department */}
+        <div className="w-full sm:w-[175px] lg:flex-[1.15]">
+          <FormControl fullWidth size="small" sx={selectSx}>
+            <Select
+              value={values.subDepartment}
+              displayEmpty
+              onChange={updateValue("subDepartment")}
+              MenuProps={menuProps}
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span className="text-[#475569]">Sub Department</span>;
+                }
 
-            {subDepartmentOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+                return selected;
+              }}
+            >
+              <MenuItem value="">All Sub Departments</MenuItem>
 
-        <FormControl fullWidth size="small" sx={inputSx}>
-          <InputLabel>Line</InputLabel>
+              {subDepartmentOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
 
-          <Select
-            value={values.line}
-            label="Line"
-            onChange={updateValue("line")}
-            MenuProps={menuProps}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
+        {/* Line */}
+        <div className="w-full sm:w-[120px] lg:flex-[0.8]">
+          <FormControl fullWidth size="small" sx={selectSx}>
+            <Select
+              value={values.line}
+              displayEmpty
+              onChange={updateValue("line")}
+              MenuProps={menuProps}
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span className="text-[#475569]">Line</span>;
+                }
 
-            {lineOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+                return selected;
+              }}
+            >
+              <MenuItem value="">All Lines</MenuItem>
 
-        <FormControl fullWidth size="small" sx={inputSx}>
-          <InputLabel>{machineLabel}</InputLabel>
+              {lineOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
 
-          <Select
-            value={values.machine}
-            label={machineLabel}
-            onChange={updateValue("machine")}
-            MenuProps={menuProps}
-          >
-            <MenuItem value="">
-              <em>All</em>
-            </MenuItem>
+        {/* Shift */}
+        <div className="w-full sm:w-[120px] lg:flex-[0.8]">
+          <FormControl fullWidth size="small" sx={selectSx}>
+            <Select
+              value={values.machine}
+              displayEmpty
+              onChange={updateValue("machine")}
+              MenuProps={menuProps}
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <span className="text-[#475569]">{machineLabel}</span>;
+                }
 
-            {machineOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+                return selected;
+              }}
+            >
+              <MenuItem value="">All Shifts</MenuItem>
 
+              {machineOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+
+        {/* From Date */}
         {showDates && (
           <>
-            <TextField
-              fullWidth
-              size="small"
-              label="From Date"
-              type="date"
-              value={values.fromDate}
-              onChange={updateValue("fromDate")}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
-              sx={{
-                ...inputSx,
-                "& .MuiOutlinedInput-input": {
-                  padding: "6px 12px",
-                  height: "32px",
-                  boxSizing: "border-box",
-                  fontSize: "14px",
-                },
-              }}
-            />
+            <div className="w-full sm:w-[150px] lg:flex-[0.9]">
+              <TextField
+                fullWidth
+                size="small"
+                label="From Date"
+                type="date"
+                value={values.fromDate}
+                onChange={updateValue("fromDate")}
+                sx={dateSx}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              />
+            </div>
 
-            <TextField
-              fullWidth
-              size="small"
-              label="To Date"
-              type="date"
-              value={values.toDate}
-              onChange={updateValue("toDate")}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
-              sx={{
-                ...inputSx,
-                "& .MuiOutlinedInput-input": {
-                  padding: "6px 12px",
-                  height: "32px",
-                  boxSizing: "border-box",
-                  fontSize: "14px",
-                },
-              }}
-            />
+            {/* To Date */}
+            <div className="w-full sm:w-[150px] lg:flex-[0.9]">
+              <TextField
+                fullWidth
+                size="small"
+                label="To Date"
+                type="date"
+                value={values.toDate}
+                onChange={updateValue("toDate")}
+                sx={dateSx}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              />
+            </div>
           </>
         )}
       </div>

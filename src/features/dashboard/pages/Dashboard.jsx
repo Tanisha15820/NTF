@@ -62,7 +62,7 @@ const Dashboard = () => {
           <Navbar setMobileOpen={setMobileOpen} activeMenu={activeMenu} />
         </div>
 
-        <main className="flex-1 overflow-y-auto px-6 pt-4 pb-6">
+        <main className="flex-1 overflow-y-auto px-6 pt-5 pb-8 space-y-6">
           <KPICards data={kpiData} />
           <Filters />
           <DailyManpower />

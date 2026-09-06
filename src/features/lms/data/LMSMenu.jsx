@@ -7,39 +7,35 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 
 export const lmsMenus = [
-   {
-       name: "Dashboard",
-       icon: <DashboardOutlinedIcon />,
-       path: "/lms/dashboard",
-     },
-   {
-     name: "Courses",
-     icon: <SchoolOutlinedIcon />,
-     path: "/lms",
-   },
-    {
-       name: "Department",
-       icon: <ApartmentOutlinedIcon />,
-       path: "/lms/department",
-     },
-       {
-       name: "Employees",
-       icon: <GroupOutlinedIcon />,
-       path: "/lms/employees",
-     },
-{
-        name: "Operators",
-        icon: <EngineeringOutlinedIcon />,
-        path: "/lms/operators",
-      },
-        {
-        name: "Users",
-        icon: <ManageAccountsOutlinedIcon />,
-        path: "/lms/users",
-      },
-        {
-       name: "Roles & Permissions",
-       icon: <AdminPanelSettingsOutlinedIcon />,
-       path: "/lms/roles",
-     },
+  {
+    name: "Dashboard",
+    icon: <DashboardOutlinedIcon />,
+    path: "/lms/dashboard",
+  },
+  {
+    name: "Courses",
+    icon: <SchoolOutlinedIcon />,
+    path: "/lms",
+  },
+  {
+    name: "Department",
+    icon: <ApartmentOutlinedIcon />,
+    path: "/lms/department",
+  },
+
+  {
+    name: "Operators",
+    icon: <EngineeringOutlinedIcon />,
+    path: "/lms/operators",
+  },
+  {
+    name: "Users",
+    icon: <ManageAccountsOutlinedIcon />,
+    path: "/lms/users",
+  },
+  {
+    name: "Roles & Permissions",
+    icon: <AdminPanelSettingsOutlinedIcon />,
+    path: "/lms/roles",
+  },
 ];

@@ -1,5 +1,4 @@
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,8 +7,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
 import { Bar } from "react-chartjs-2";
+import {
+  CHART_COLORS,
+  getBarChartOptions,
+  createBarDataset,
+} from "../../../utils/chartConfig";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -35,126 +38,61 @@ const labels = [
 const chartData = {
   labels,
   datasets: [
-    {
+    createBarDataset({
       label: "Male",
       data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      backgroundColor: "#d7a5a6",
+      color: CHART_COLORS.primary,
       borderRadius: 0,
-      borderSkipped: false,
       barThickness: 20,
-    },
-    {
+    }),
+    createBarDataset({
       label: "Female",
       data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      backgroundColor: "#9f0100",
+      color: CHART_COLORS.pink,
       borderRadius: 0,
-      borderSkipped: false,
       barThickness: 20,
-    },
+    }),
   ],
 };
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-
-  animation: {
-    duration: 700,
-  },
-
-  plugins: {
-    legend: {
-      position: "top",
-      align: "end",
-
-      labels: {
-        usePointStyle: true,
-        pointStyle: "circle",
-        padding: 25,
-        boxWidth: 10,
-        boxHeight: 10,
-
-        color: "#374151",
-
-        font: {
-          size: 13,
-          weight: "600",
-        },
-      },
-    },
-  },
-
-  scales: {
-    x: {
-      grid: {
-        display: false,
-        drawBorder: false,
-        drawTicks: false,
-      },
-
-      border: {
-        display: false,
-      },
-
-      ticks: {
-        color: "#6B7280",
-      },
-    },
-
-    y: {
-      beginAtZero: true,
-
-      grid: {
-        display: false,
-        drawBorder: false,
-        drawTicks: false,
-      },
-
-      border: {
-        display: false,
-      },
-
-      ticks: {
-        stepSize: 20,
-        color: "#6B7280",
-      },
-    },
-  },
-};
+const options = getBarChartOptions({
+  yStepSize: 20,
+});
 
 const GenderAttendance = () => {
   return (
-    <div className="mt-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="h-10 w-10 rounded-xl bg-[#ffe3e0] flex items-center justify-center">
-            <PeopleAltIcon
-              sx={{
-                color: "#d9363b",
-                fontSize: 20,
-              }}
-            />
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md h-full flex flex-col justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div className="flex items-center gap-3.5">
+          <div className="h-11 w-11 rounded-xl bg-[#F3EEFF] text-[#6F4AE7] flex items-center justify-center shadow-xs">
+            <PeopleAltIcon sx={{ fontSize: 22 }} />
           </div>
 
           <div>
-            <h1 className="text-sm font-bold text-gray-800">
-              Gender Distribution
-            </h1>
-            <p className="text-xs text-gray-500">
+            <h2 className="text-base font-bold text-slate-800 tracking-tight">
+              Gender Attendance
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
               Deployed headcount with day-over-day movement
             </p>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <div
-            className="h-[200px]"
-            style={{
-              minWidth: "1600px",
-            }}
-          >
-            <Bar data={chartData} options={options} />
-          </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 whitespace-nowrap">
+            Avg Attendance: 88.6%
+          </span>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto custom-chart-scrollbar pb-2">
+        <div
+          className="h-[240px]"
+          style={{
+            minWidth: "1600px",
+          }}
+        >
+          <Bar data={chartData} options={options} />
         </div>
       </div>
     </div>

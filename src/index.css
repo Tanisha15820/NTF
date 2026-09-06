@@ -21,3 +21,24 @@ select:-webkit-autofill:focus {
   -webkit-text-fill-color: #000000;
   transition: background-color 9999s ease-in-out 0s;
 }
+
+/* Custom Scrollbar for Charts and Tables */
+.custom-chart-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-chart-scrollbar::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 9999px;
+}
+
+.custom-chart-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+.custom-chart-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
