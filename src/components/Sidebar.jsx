@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import logo from "../assets/images/NTF_logo_black.png";
 import sidebarBg from "../assets/images/sidebar_bg.png";
-import { Menu, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = ({
@@ -16,14 +16,31 @@ const Sidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Desktop = Open
+  // Mobile = Collapsed
   useEffect(() => {
-    if (window.innerWidth < 1024 && !collapsed) {
-      setCollapsed(true);
-    }
-  }, []);
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+
+    // Set initial state
+    handleResize();
+
+    // Update when screen size changes
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [setCollapsed]);
 
   return (
     <>
+      {/* Mobile Overlay */}
       {mobileOpen && !collapsed && (
         <div
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
@@ -34,6 +51,7 @@ const Sidebar = ({
         />
       )}
 
+      {/* Sidebar */}
       <aside
         className={`relative flex h-screen flex-col overflow-hidden border-r border-gray-200 bg-gradient-to-b from-white via-white to-primary/5 shadow-xl transition-all duration-300 ${
           collapsed ? "w-20" : "w-64"
@@ -55,9 +73,9 @@ const Sidebar = ({
               collapsed ? "justify-center px-2" : "justify-between px-4"
             }`}
           >
+            {/* Logo */}
             {!collapsed && (
               <div className="flex items-center gap-2.5">
-                {/* Logo */}
                 <div className="flex items-center">
                   <img
                     src={logo}
@@ -72,7 +90,11 @@ const Sidebar = ({
             <button
               onClick={() => {
                 setCollapsed(!collapsed);
-                setMobileOpen(true);
+
+                // Close mobile sidebar when collapsing
+                if (window.innerWidth < 1024) {
+                  setMobileOpen(false);
+                }
               }}
               className="flex h-9 w-9 items-center justify-center rounded-lg p-2 text-primary transition-all hover:bg-primary/10 hover:text-primary"
               title={collapsed ? "Expand" : "Collapse"}
@@ -99,6 +121,7 @@ const Sidebar = ({
                     <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-gradient-to-b from-primary-light to-primary-dark" />
                   )}
 
+                  {/* Menu Button */}
                   <button
                     onClick={() => {
                       setActiveMenu(item.name);
@@ -107,8 +130,10 @@ const Sidebar = ({
                         navigate(item.path);
                       }
 
+                      // Collapse sidebar after selecting menu on mobile
                       if (window.innerWidth < 1024) {
                         setCollapsed(true);
+                        setMobileOpen(false);
                       }
                     }}
                     className={`flex w-full items-center rounded-xl py-2.5 transition-all duration-200 ${
