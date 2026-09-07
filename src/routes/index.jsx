@@ -7,11 +7,13 @@ import Attendance from "../features/dashboard/pages/Attendance";
 import Requirement from "../features/dashboard/pages/Requirement";
 import LMS from "../features/lms/pages/LMS";
 import L0 from "../features/lms/pages/L0";
+import L0Editor from "../features/lms/pages/L0Editor";
 import L0Preview from "../features/lms/pages/L0Preview";
 import L1 from "../features/lms/pages/L1";
 import L1Preview from "../features/lms/pages/L1Preview";
 import DepartmentPage from "../features/lms/pages/Department";
 import SectionPage from "../features/lms/pages/SectionPage";
+import LinesPage from "../features/lms/pages/LinesPage";
 import MachinePage from "../features/lms/pages/MachinePage";
 import Roles from "../features/lms/pages/Roles";
 import LMSDashboard from "../features/lms/pages/LMSDashboard";
@@ -32,27 +34,15 @@ const App = () => {
         <Route path="/lms" element={<LMS />} />
         <Route path="/lms/dashboard" element={<LMSDashboard />} />
         <Route path="/lms/department" element={<DepartmentPage />} />
-        {/* View Section */}
-        <Route path="/lms/section/:deptId" element={<SectionPage />} />
+        {/* Sub-Departments */}
+        <Route path="/lms/subdepartment/:deptId" element={<SectionPage />} />
 
-        {/* Add Section */}
-        <Route path="/lms/section/add/:deptId" element={<SectionPage />} />
+        {/* Lines */}
+        <Route path="/lms/line/:deptId/:subDeptId" element={<LinesPage />} />
 
-        {/* Edit Section */}
+        {/* Machines */}
         <Route
-          path="/lms/section/edit/:deptId/:sectionId"
-          element={<SectionPage />}
-        />
-
-        {/* 
-          URL:
-          /lms/machine/:deptId/:sectionId/:lineId
-
-          Example:
-          /lms/machine/department_123/section_456/line_789
-        */}
-        <Route
-          path="/lms/machine/:deptId/:sectionId/:lineId"
+          path="/lms/machine/:deptId/:subDeptId/:lineId"
           element={<MachinePage />}
         />
 
@@ -65,6 +55,8 @@ const App = () => {
         <Route path="/lms/operator/:id" element={<OperatorProfile />} />
 
         <Route path="/lms/l0" element={<L0 />} />
+
+        <Route path="/lms/l0/editor" element={<L0Editor />} />
 
         <Route path="/lms/l0/preview" element={<L0Preview />} />
 

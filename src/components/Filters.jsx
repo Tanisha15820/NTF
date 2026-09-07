@@ -158,12 +158,10 @@ const Filters = ({
                 if (!selected) {
                   return <span className="text-[#475569]">Department</span>;
                 }
-
                 return selected;
               }}
             >
               <MenuItem value="">All Departments</MenuItem>
-
               {departmentOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -185,12 +183,10 @@ const Filters = ({
                 if (!selected) {
                   return <span className="text-[#475569]">Sub Department</span>;
                 }
-
                 return selected;
               }}
             >
               <MenuItem value="">All Sub Departments</MenuItem>
-
               {subDepartmentOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -212,12 +208,10 @@ const Filters = ({
                 if (!selected) {
                   return <span className="text-[#475569]">Line</span>;
                 }
-
                 return selected;
               }}
             >
               <MenuItem value="">All Lines</MenuItem>
-
               {lineOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -239,12 +233,10 @@ const Filters = ({
                 if (!selected) {
                   return <span className="text-[#475569]">{machineLabel}</span>;
                 }
-
                 return selected;
               }}
             >
               <MenuItem value="">All Shifts</MenuItem>
-
               {machineOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}

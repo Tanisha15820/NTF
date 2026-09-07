@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/Sidebar";
 import Navbar from "../../../components/Navbar";
 import QuestionPaperTable from "../components/QuestionPaperTable";
+import TrainingSchedule from "../components/TrainingSchedule";
+import PracticeEvaluationSheet from "../components/PracticeEvaluationSheet";
+import TrainingFeedback from "../components/TrainingFeedback";
 import LMSTabs from "../components/LMSTabs";
 import { lmsMenus } from "../data/LMSMenu";
 
@@ -15,7 +18,7 @@ const LMS = () => {
   const [activeTab, setActiveTab] = useState("Test Papers");
 
   const handleCreatePaper = () => {
-    console.log("Create Test Paper");
+    navigate("/lms/l0/editor");
   };
 
   const handleViewPaper = (paper) => {
@@ -32,10 +35,14 @@ const LMS = () => {
     if (tab === "Day 1") {
       navigate("/lms/l0");
     }
+
+    if (tab === "Day 2") {
+      navigate("/lms/l1");
+    }
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar
         menuItems={lmsMenus}
         mobileOpen={mobileOpen}
@@ -64,17 +71,13 @@ const LMS = () => {
             />
           )}
 
-          {activeTab === "Day 1" && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6">
-              Day 1
-            </div>
+          {activeTab === "Training Schedule" && <TrainingSchedule />}
+
+          {activeTab === "Practice Evaluation Sheet" && (
+            <PracticeEvaluationSheet />
           )}
 
-          {activeTab === "Day 2" && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6">
-              Day 2
-            </div>
-          )}
+          {activeTab === "Training Feedback" && <TrainingFeedback />}
         </main>
       </div>
     </div>

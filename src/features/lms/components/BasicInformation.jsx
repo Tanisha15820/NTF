@@ -22,8 +22,11 @@ const BasicInformation = ({ onNext, initialData = {}, onChange }) => {
 
   const [formData, setFormData] = useState({
     testTitle: initialData.testTitle || "SKILL EVALUATION TEST PAPER",
-    description: initialData.description || "Assessment module for technical skills & safety procedures.",
-    headerTitle: initialData.headerTitle || "NTF TECHNICAL EVALUATION TEST PAPER",
+    description:
+      initialData.description ||
+      "Assessment module for technical skills & safety procedures.",
+    headerTitle:
+      initialData.headerTitle || "NTF TECHNICAL EVALUATION TEST PAPER",
     subTitle: initialData.subTitle || "New Manpower Technical Assessment",
     departments: initialData.departments || "Production",
     sections: initialData.sections || "Section A",
@@ -66,7 +69,8 @@ const BasicInformation = ({ onNext, initialData = {}, onChange }) => {
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              {formData.testTitle || "Configure test header, duration, & parameters"}
+              {formData.testTitle ||
+                "Configure test header, duration, & parameters"}
             </p>
           </div>
         </div>
@@ -111,7 +115,9 @@ const BasicInformation = ({ onNext, initialData = {}, onChange }) => {
                 placeholder="e.g. New Manpower Technical Assessment"
                 className={inputClass}
               />
-              <p className={hintClass}>Displayed below main paper title on the printed test sheet.</p>
+              <p className={hintClass}>
+                Displayed below main paper title on the printed test sheet.
+              </p>
             </div>
 
             <div className="md:col-span-2">
@@ -136,7 +142,8 @@ const BasicInformation = ({ onNext, initialData = {}, onChange }) => {
                 className={inputClass}
               />
               <p className={hintClass}>
-                Official organization banner printed at the top center of the test sheet.
+                Official organization banner printed at the top center of the
+                test sheet.
               </p>
             </div>
 
@@ -166,7 +173,7 @@ const BasicInformation = ({ onNext, initialData = {}, onChange }) => {
             </div>
 
             <div>
-              <label className={labelClass}>Section / Category</label>
+              <label className={labelClass}>Sub-Department</label>
               <div className="relative">
                 <select
                   name="sections"
@@ -238,4 +245,3 @@ const BasicInformation = ({ onNext, initialData = {}, onChange }) => {
 };
 
 export default BasicInformation;
-

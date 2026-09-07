@@ -1,4 +1,5 @@
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,11 +9,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import {
-  CHART_COLORS,
-  getBarChartOptions,
-  createBarDataset,
-} from "../../../utils/chartConfig";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -38,56 +34,170 @@ const labels = [
 const chartData = {
   labels,
   datasets: [
-    createBarDataset({
+    {
       label: "Female",
       data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      color: CHART_COLORS.pink,
-      borderRadius: 0,
-      barThickness: 20,
-    }),
-    createBarDataset({
+      backgroundColor: "#EC4899",
+      borderRadius: {
+        topLeft: 5,
+        topRight: 5,
+        bottomLeft: 0,
+        bottomRight: 0,
+      },
+      borderSkipped: "bottom",
+    },
+    {
       label: "Male",
       data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      color: CHART_COLORS.blue,
-      borderRadius: 0,
-      barThickness: 20,
-    }),
+      backgroundColor: "#3B82F6",
+      borderRadius: {
+        topLeft: 5,
+        topRight: 5,
+        bottomLeft: 0,
+        bottomRight: 0,
+      },
+      borderSkipped: "bottom",
+    },
   ],
 };
 
-const options = getBarChartOptions({
-  yStepSize: 20,
-});
+const options = {
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: {
+    mode: "index",
+    intersect: false,
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      backgroundColor: "#1E293B",
+      titleColor: "#FFFFFF",
+      bodyColor: "#FFFFFF",
+      padding: 10,
+      cornerRadius: 8,
+      displayColors: true,
+      callbacks: {
+        label: function (context) {
+          return ` ${context.dataset.label}: ${context.raw}`;
+        },
+      },
+    },
+  },
+  scales: {
+    x: {
+      offset: true,
+      grid: {
+        display: false,
+        drawBorder: false,
+      },
+      border: {
+        display: false,
+      },
+      barPercentage: 0.98,
+      categoryPercentage: 0.4,
+      ticks: {
+        color: "#64748B",
+        font: {
+          size: 10,
+          weight: "500",
+        },
+        padding: 5,
+      },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 20,
+        color: "#64748B",
+        font: {
+          size: 9,
+        },
+        padding: 8,
+      },
+      grid: {
+        color: "#E8EDF5",
+        drawTicks: false,
+      },
+      border: {
+        display: false,
+      },
+    },
+  },
+};
 
 const GenderDistribution = () => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="h-11 w-11 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center shadow-xs">
-            <PeopleAltIcon sx={{ fontSize: 22 }} />
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-5 pt-4">
+        <div className="flex items-center justify-between">
+          {/* Left side */}
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F46E5]">
+              <PeopleAltIcon sx={{ fontSize: 20 }} />
+            </div>
+
+            <div>
+              <h2 className="text-sm font-bold text-slate-800">
+                Gender Distribution
+              </h2>
+
+              <p className="text-[10px] text-slate-500 mt-0.5">
+                Deployed headcount with day-over-day movement
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h2 className="text-base font-bold text-slate-800 tracking-tight">
-              Gender Distribution
-            </h2>
-            <p className="text-xs text-slate-500 font-medium">
-              Deployed headcount with day-over-day movement
-            </p>
+          {/* Right side */}
+          <div className="flex items-center gap-4">
+            {/* Ratio */}
+            <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pink-50">
+              <span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
+
+              <span className="text-[10px] font-semibold text-pink-600 whitespace-nowrap">
+                Ratio: 48% F / 52% M
+              </span>
+            </span>
+
+            {/* More button */}
+            <button className="w-7 h-7 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition">
+              <MoreVertIcon
+                sx={{
+                  fontSize: 17,
+                  color: "#64748B",
+                }}
+              />
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-100 whitespace-nowrap">
-            Ratio: 48% F / 52% M
-          </span>
+        {/* Legend */}
+        <div className="flex justify-end items-center gap-4 mt-3">
+          {/* Female */}
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#EC4899]"></span>
+
+            <span className="text-[9px] font-medium text-slate-500">
+              Female
+            </span>
+          </div>
+
+          {/* Male */}
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
+
+            <span className="text-[9px] font-medium text-slate-500">Male</span>
+          </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto custom-chart-scrollbar pb-2">
+      {/* Scrollable Chart */}
+      <div className="px-4 pb-4 pt-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
         <div
-          className="h-[240px]"
+          className="h-[230px]"
           style={{
             minWidth: "1600px",
           }}

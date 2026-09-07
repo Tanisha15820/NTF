@@ -26,7 +26,6 @@ const QuestionPaperPreview = ({ level = "L0" }) => {
   const navigate = useNavigate();
   const storageKey = `${level.toLowerCase()}_question_paper`;
   const editorPath = `/lms/${level.toLowerCase()}`;
-  const levelLabel = level === "L0" ? "Day 1" : "Day 2";
   const [sections] = useState(() => loadSavedPaper(storageKey));
   const [showAnswerKey, setShowAnswerKey] = useState(false);
   const [paperMeta] = useState(() => {
@@ -45,7 +44,7 @@ const QuestionPaperPreview = ({ level = "L0" }) => {
   );
 
   const testTitle = paperMeta.headerTitle || "SKILL EVALUATION TEST PAPER";
-  const subTitle = paperMeta.subTitle || `New Manpower for ${levelLabel}`;
+  const subTitle = paperMeta.subTitle || "New Manpower for DOJO Hiring";
   const department = paperMeta.departments || "Production";
   const duration = paperMeta.duration || 60;
 

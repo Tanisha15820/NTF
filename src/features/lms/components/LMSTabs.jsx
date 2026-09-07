@@ -1,6 +1,13 @@
 import { useState } from "react";
 
-const defaultTabs = ["Test Papers", "Day 1", "Day 2"];
+const defaultTabs = [
+  "Test Papers",
+  "Day 1",
+  "Day 2",
+  "Training Schedule",
+  "Practice Evaluation Sheet",
+  "Training Feedback",
+];
 
 const LMSTabs = ({ tabs = defaultTabs, activeTab, onTabChange }) => {
   const [internalActiveTab, setInternalActiveTab] = useState(

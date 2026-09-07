@@ -1,5 +1,5 @@
-import QuestionPaperPage from "../components/QuestionPaperPage";
+import Day2QuestionPaper from "../components/Day2QuestionPaper";
 
-const L1 = () => <QuestionPaperPage level="L1" />;
+const L1 = () => <Day2QuestionPaper />;
 
 export default L1;

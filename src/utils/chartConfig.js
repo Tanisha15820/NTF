@@ -26,8 +26,8 @@ export const getBarChartOptions = ({
   legendAlign = "end",
   showGridLines = true,
   stacked = false,
-  barPercentage = 0.7,
-  categoryPercentage = 0.75,
+  barPercentage = 0.3,
+  categoryPercentage = 0.4,
   yAxisFormatter,
   xAxisFormatter,
 } = {}) => {
@@ -71,9 +71,9 @@ export const getBarChartOptions = ({
       },
       tooltip: {
         enabled: true,
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
-        titleColor: "#F8FAFC",
-        bodyColor: "#E2E8F0",
+        backgroundColor: "#1E293B",
+        titleColor: "#FFFFFF",
+        bodyColor: "#FFFFFF",
         borderColor: "rgba(255, 255, 255, 0.08)",
         borderWidth: 1,
         padding: {
@@ -121,6 +121,9 @@ export const getBarChartOptions = ({
     scales: {
       x: {
         stacked: stacked,
+        offset: true,
+        barPercentage: barPercentage,
+        categoryPercentage: categoryPercentage,
         grid: {
           display: false,
           drawBorder: false,
@@ -147,15 +150,15 @@ export const getBarChartOptions = ({
         max: yMax,
         grid: {
           display: showGridLines,
-          color: "rgba(226, 232, 240, 0.7)",
+          color: "#E8EDF5",
           drawBorder: false,
           drawTicks: false,
-          borderDash: [4, 4],
+          borderDash: [],
           lineWidth: 1,
         },
         border: {
           display: false,
-          dash: [4, 4],
+          dash: [],
         },
         ticks: {
           stepSize: yStepSize,
@@ -176,17 +179,20 @@ export const getBarChartOptions = ({
 };
 
 /**
- * Helper to build stylized bar dataset with custom thickness and no border radius
+ * Helper to build stylized bar dataset with rounded-top bars (manpower style).
+ * Bar sizes are controlled by the scale-level barPercentage/categoryPercentage so
+ * that spacing between bars matches the Daily Manpower chart.
  */
 export const createBarDataset = ({
   label,
   data,
   color,
-  borderRadius = 0,
-  barPercentage = 0.7,
-  categoryPercentage = 0.75,
-  barThickness = 20,
-  maxBarThickness = 32,
+  borderRadius = {
+    topLeft: 5,
+    topRight: 5,
+    bottomLeft: 0,
+    bottomRight: 0,
+  },
   stack,
 }) => ({
   label,
@@ -194,10 +200,6 @@ export const createBarDataset = ({
   backgroundColor: color,
   hoverBackgroundColor: color,
   borderRadius: borderRadius,
-  borderSkipped: false,
-  barPercentage,
-  categoryPercentage,
-  barThickness: barThickness,
-  maxBarThickness,
+  borderSkipped: "bottom",
   stack,
 });
