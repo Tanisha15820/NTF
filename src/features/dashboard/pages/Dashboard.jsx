@@ -9,6 +9,9 @@ import DailyManpower from "../components/DailyManpower";
 import KPICards from "../../../components/KPICards";
 import Filters from "../../../components/Filters";
 import Attrition from "../components/Attrition";
+import Absentism from "../components/Absentism";
+import DailySalary from "../components/DailySalary";
+
 import GenderDistribution from "../components/GenderDistribution";
 import GenderAttendance from "../components/GenderAttendance";
 import { dashboardMenus } from "../data/DashboardMenu";
@@ -67,10 +70,10 @@ const Dashboard = () => {
           <Filters />
           <DailyManpower />
           <Attrition />
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <GenderDistribution />
-            <GenderAttendance />
-          </div>
+          <Absentism />
+          <DailySalary />
+          <GenderDistribution />
+          <GenderAttendance />
         </main>
       </div>
     </div>

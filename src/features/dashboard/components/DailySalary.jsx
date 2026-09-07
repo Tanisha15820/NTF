@@ -1,4 +1,4 @@
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import PaymentsIcon from "@mui/icons-material/Payments";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,16 +39,23 @@ const chartData = {
   labels,
   datasets: [
     createBarDataset({
-      label: "Female",
-      data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      color: CHART_COLORS.pink,
+      label: "Regular Wages",
+      data: [140, 155, 130, 165, 150, 110, 160, 140, 155, 130, 165, 150, 110, 160, 155, 138],
+      color: CHART_COLORS.teal,
       borderRadius: 0,
       barThickness: 20,
     }),
     createBarDataset({
-      label: "Male",
-      data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      color: CHART_COLORS.blue,
+      label: "Overtime (OT)",
+      data: [25, 35, 18, 40, 30, 15, 38, 25, 35, 18, 40, 30, 15, 38, 35, 22],
+      color: CHART_COLORS.warning,
+      borderRadius: 0,
+      barThickness: 20,
+    }),
+    createBarDataset({
+      label: "Total Payout",
+      data: [165, 190, 148, 205, 180, 125, 198, 165, 190, 148, 205, 180, 125, 198, 190, 160],
+      color: CHART_COLORS.primary,
       borderRadius: 0,
       barThickness: 20,
     }),
@@ -56,31 +63,32 @@ const chartData = {
 };
 
 const options = getBarChartOptions({
-  yStepSize: 20,
+  yStepSize: 50,
+  yAxisFormatter: (val) => `₹${val}k`,
 });
 
-const GenderDistribution = () => {
+const DailySalary = () => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-3.5">
-          <div className="h-11 w-11 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center shadow-xs">
-            <PeopleAltIcon sx={{ fontSize: 22 }} />
+          <div className="h-11 w-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-xs">
+            <PaymentsIcon sx={{ fontSize: 22 }} />
           </div>
 
           <div>
             <h2 className="text-base font-bold text-slate-800 tracking-tight">
-              Gender Distribution
+              Daily Salary & Wage Distribution
             </h2>
             <p className="text-xs text-slate-500 font-medium">
-              Deployed headcount with day-over-day movement
+              Daily wage expenses and overtime payout tracking
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-100 whitespace-nowrap">
-            Ratio: 48% F / 52% M
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+            Avg Daily: ₹1.68L
           </span>
         </div>
       </div>
@@ -99,4 +107,4 @@ const GenderDistribution = () => {
   );
 };
 
-export default GenderDistribution;
+export default DailySalary;

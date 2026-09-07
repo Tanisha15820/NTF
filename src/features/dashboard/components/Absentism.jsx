@@ -1,4 +1,4 @@
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import EventBusyIcon from "@mui/icons-material/EventBusy";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,16 +39,23 @@ const chartData = {
   labels,
   datasets: [
     createBarDataset({
-      label: "Female",
-      data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      color: CHART_COLORS.pink,
+      label: "Planned Leave",
+      data: [12, 15, 8, 14, 10, 6, 16, 12, 15, 8, 14, 10, 6, 16, 15, 10],
+      color: CHART_COLORS.blue,
       borderRadius: 0,
       barThickness: 20,
     }),
     createBarDataset({
-      label: "Male",
-      data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      color: CHART_COLORS.blue,
+      label: "Unplanned Absent",
+      data: [18, 25, 14, 28, 22, 12, 26, 18, 25, 14, 28, 22, 12, 26, 25, 18],
+      color: CHART_COLORS.danger,
+      borderRadius: 0,
+      barThickness: 20,
+    }),
+    createBarDataset({
+      label: "Total Absent",
+      data: [30, 40, 22, 42, 32, 18, 42, 30, 40, 22, 42, 32, 18, 42, 40, 28],
+      color: CHART_COLORS.primary,
       borderRadius: 0,
       barThickness: 20,
     }),
@@ -56,31 +63,31 @@ const chartData = {
 };
 
 const options = getBarChartOptions({
-  yStepSize: 20,
+  yStepSize: 10,
 });
 
-const GenderDistribution = () => {
+const Absentism = () => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-3.5">
-          <div className="h-11 w-11 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center shadow-xs">
-            <PeopleAltIcon sx={{ fontSize: 22 }} />
+          <div className="h-11 w-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-xs">
+            <EventBusyIcon sx={{ fontSize: 22 }} />
           </div>
 
           <div>
             <h2 className="text-base font-bold text-slate-800 tracking-tight">
-              Gender Distribution
+              Daily Absenteeism
             </h2>
             <p className="text-xs text-slate-500 font-medium">
-              Deployed headcount with day-over-day movement
+              Tracking planned vs unplanned absenteeism movement
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-100 whitespace-nowrap">
-            Ratio: 48% F / 52% M
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-100">
+            Monthly Average: 4.8%
           </span>
         </div>
       </div>
@@ -99,4 +106,4 @@ const GenderDistribution = () => {
   );
 };
 
-export default GenderDistribution;
+export default Absentism;

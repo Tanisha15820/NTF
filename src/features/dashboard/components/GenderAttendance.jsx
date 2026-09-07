@@ -61,7 +61,7 @@ const options = getBarChartOptions({
 
 const GenderAttendance = () => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md h-full flex flex-col justify-between">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 transition-all duration-300 hover:shadow-md">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-3.5">
           <div className="h-11 w-11 rounded-xl bg-[#F3EEFF] text-[#6F4AE7] flex items-center justify-center shadow-xs">
