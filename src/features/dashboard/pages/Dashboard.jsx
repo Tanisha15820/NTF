@@ -13,7 +13,7 @@ import Absentism from "../components/Absentism";
 import DailySalary from "../components/DailySalary";
 
 import GenderDistribution from "../components/GenderDistribution";
-import GenderAttendance from "../components/GenderAttendance";
+// import GenderAttendance from "../components/GenderAttendance";
 import { dashboardMenus } from "../data/DashboardMenu";
 
 const kpiData = [
@@ -73,7 +73,7 @@ const Dashboard = () => {
           <Absentism />
           <DailySalary />
           <GenderDistribution />
-          <GenderAttendance />
+          {/* <GenderAttendance /> */}
         </main>
       </div>
     </div>
