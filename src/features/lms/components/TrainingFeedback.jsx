@@ -1,292 +1,863 @@
 import { useState } from "react";
-import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
-import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
-import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
-import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import logo from "../../../assets/images/NTF_logo_black.png";
 
-const DETAIL_FIELDS = [
+// ============================================================
+// FEEDBACK QUESTIONS
+// ============================================================
+
+const questions = [
   {
-    key: "name",
-    label: "Name of the Participant/Employee (प्रतिभागी/कर्मचारी का नाम)",
+    english: "The objectives of the training were met",
+    hindi: "प्रशिक्षण के उद्देश्य पूरे हो गए",
   },
-  { key: "unit", label: "Unit (यूनिट)" },
-  { key: "department", label: "Department (विभाग)" },
-  { key: "designation", label: "Designation (पदनाम)" },
-  { key: "staffId", label: "Staff ID (स्टाफ आईडी)" },
-  { key: "email", label: "Email ID (ईमेल आईडी)" },
-  { key: "title", label: "Title of the Training (प्रशिक्षण का शीर्षक)" },
-  { key: "date", label: "Date of Training (प्रशिक्षण की तिथि)" },
   {
-    key: "faculty",
-    label:
-      "Training Conducting Faculty (प्रशिक्षण संचालित करने वाले प्रशिक्षक का नाम)",
+    english: "The presenters were engaging",
+    hindi: "प्रस्तुतकर्ताओं की प्रस्तुति आकर्षक और रोचक थी",
   },
-  { key: "duration", label: "Duration (From – To) प्रशिक्षण अवधि" },
+  {
+    english: "The presentation materials were relevant",
+    hindi: "प्रस्तुति में दी गई जानकारी विषय के अनुसार थी",
+  },
+  {
+    english: "The content of the course was organised and easy to follow",
+    hindi: "पाठ्यक्रम की विषय वस्तु व्यवस्थित और समझने में आसान थी",
+  },
+  {
+    english: "The trainers were well prepared and able to answer any questions",
+    hindi:
+      "प्रशिक्षक अच्छी तरह से तैयार थे और सभी प्रश्नों का उत्तर देने में सक्षम थे",
+  },
+  {
+    english: "The course length was appropriate",
+    hindi: "कोर्स की समयावधि उपयुक्त थी",
+  },
+  {
+    english:
+      "The pace of the course was appropriate to the content and attendees",
+    hindi: "कोर्स की गति, विषय और उपस्थित लोगों के लिए सही थी",
+  },
+  {
+    english: "The exercises/role play were helpful and relevant",
+    hindi: "अभ्यास/भूमिका-निर्वाह उपयोगी और उपयुक्त थे",
+  },
 ];
 
-const RATING_OPTIONS = [
-  "Strongly Agree",
-  "Agree",
-  "Disagree",
-  "Strongly Disagree",
-  "Not Relevant to this Event",
-];
-
-const RATING_ROWS = [
-  "The objectives of the training were met (प्रशिक्षण के उद्देश्य पूरे हो गए)",
-  "The presenters were engaging (प्रस्तुतकर्ताओं की प्रस्तुति आकर्षक और स्पष्ट थी।)",
-  "The presentation materials were relevant (प्रस्तुति में दी गई जानकारी विषय के अनुसार थी।)",
-  "The content of the course was organised and easy to follow (पाठ्यक्रम की विषयवस्तु व्यवस्थित और समझने में आसान थी)",
-  "The trainers were well prepared and able to answer any questions (प्रशिक्षक अच्छी तरह से तैयार थे और किसी भी प्रश्न का उत्तर देने में सक्षम थे।)",
-  "The course length was appropriate (कोर्स की समयावधि उपयुक्त थी)",
-  "The pace of the course was appropriate to the content and attendees (कोर्स की गति, विषय और उपस्थित लोगों के लिए सही थी।)",
-  "The exercises/role play were helpful and relevant (अभ्यास/भूमिका-निर्वाह उपयोगी और उपयुक्त थे।)",
-];
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
 
 const TrainingFeedback = () => {
-  const [details, setDetails] = useState(() =>
-    Object.fromEntries(DETAIL_FIELDS.map((f) => [f.key, ""]))
-  );
+  // ==========================================================
+  // PARTICIPANT DETAILS
+  // ==========================================================
 
-  const [ratings, setRatings] = useState(() =>
-    RATING_ROWS.map(() => "")
-  );
+  const [details, setDetails] = useState({
+    participant: "",
+    unit: "",
+    department: "",
+    designation: "",
+    staffId: "",
+    email: "",
+    trainingTitle: "",
+    trainingDate: "",
+    faculty: "",
+    duration: "",
+  });
 
-  const handleDetailChange = (key) => (event) => {
-    setDetails((prev) => ({ ...prev, [key]: event.target.value }));
+  // ==========================================================
+  // FEEDBACK ANSWERS
+  // ==========================================================
+
+  const [answers, setAnswers] = useState(questions.map(() => ""));
+
+  // ==========================================================
+  // HANDLE INPUT CHANGE
+  // ==========================================================
+
+  const handleDetailChange = (field) => (event) => {
+    setDetails({
+      ...details,
+      [field]: event.target.value,
+    });
   };
 
-  const handleRatingChange = (index) => (value) => {
-    setRatings((prev) => prev.map((r, idx) => (idx === index ? value : r)));
+  // ==========================================================
+  // HANDLE FEEDBACK SELECTION
+  // ==========================================================
+
+  const handleAnswerChange = (questionIndex, answer) => {
+    const updatedAnswers = [...answers];
+
+    updatedAnswers[questionIndex] = answer;
+
+    setAnswers(updatedAnswers);
   };
 
-  const inputClass =
-    "h-9 w-full rounded-lg border border-gray-200 bg-white px-3 text-xs text-gray-700 outline-none transition focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/10";
+  // ==========================================================
+  // RENDER RATING MARK (tick on the selected option, cross on the rest)
+  // ==========================================================
+
+  const renderRatingMark = (answer, option) => {
+    if (answer === option) {
+      return <span className="text-[25px] font-normal">✓</span>;
+    }
+
+    if (answer !== "") {
+      return <span className="text-[25px] font-normal">✗</span>;
+    }
+
+    return null;
+  };
+
+  // ==========================================================
+  // RETURN
+  // ==========================================================
 
   return (
-    <div className="space-y-5">
-      {/* HEADER */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-gray-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary-dark shadow-sm">
-              <RateReviewOutlinedIcon sx={{ color: "#fff", fontSize: 22 }} />
+    <>
+      {/* ======================================================
+          PRINT BUTTON
+      ======================================================= */}
+
+      <div className="mb-4 flex justify-end print:hidden">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="
+            flex
+            items-center
+            gap-2
+            bg-black
+            px-5
+            py-2.5
+            text-sm
+            font-medium
+            text-white
+            transition
+            hover:bg-gray-800
+          "
+        >
+          <PrintOutlinedIcon sx={{ fontSize: 19 }} />
+          Print
+        </button>
+      </div>
+
+      {/* ======================================================
+          MAIN FORM
+      ======================================================= */}
+
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1100px]
+          bg-white
+          p-3
+          text-black
+          sm:p-5
+          print:max-w-none
+          print:p-0
+        "
+      >
+        {/* ====================================================
+            OUTER BORDER
+        ===================================================== */}
+
+        <div className="border border-black">
+          {/* ==================================================
+              HEADER
+          =================================================== */}
+
+          <div className="px-4 py-5 sm:px-6">
+            {/*  NTF LOGO + DOCUMENT DETAILS */}
+
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="text-center sm:text-left">
+                <img
+                  src={logo}
+                  alt="NTF Logo"
+                  className="mx-auto h-18 w-auto object-contain sm:mx-0"
+                />
+              </div>
+
+              <div className="text-center text-[13px] font-semibold leading-6 sm:text-right">
+                <p>Doc. No.- TF06(AMD-02)</p>
+
+                <p>Issue Date- 18/04/2025</p>
+
+                <p>Rev. No.- 01</p>
+              </div>
             </div>
 
-            <div>
-              <h2 className="text-base font-bold text-gray-900 leading-tight">
+            {/* ------------------------------------------------
+                FORM TITLE
+            ------------------------------------------------- */}
+
+            <div className="mt-4 flex flex-col items-center">
+              <h1 className="text-center text-[20px] font-bold underline sm:text-[24px]">
                 Training Feedback Form
-              </h2>
-              <p className="text-xs text-gray-500">
-                Collect and review feedback from trainees and trainers
+              </h1>
+
+              <p className="mt-1 text-[12px] font-medium text-center sm:text-[13px]">
+                कृपया इस फॉर्म को ध्यानपूर्वक और ध्यानपूर्वक भरें।
               </p>
             </div>
           </div>
 
-          <div className="text-xs text-gray-500">
-            डॉक्यूमेंट रिफ़रेंस:
-            <span className="font-semibold text-gray-700"> F06(AMD-02)</span>
-          </div>
-        </div>
+          {/* ==================================================
+              PARTICIPANT INFORMATION TABLE
+          =================================================== */}
 
-        {/* DOC REFERENCE */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 bg-gray-50/60 px-5 py-3">
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Doc. No.:</span>{" "}
-            F06(AMD-02)
-          </p>
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Issue Date:</span>{" "}
-            18/04/2025
-          </p>
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Rev. No.:</span> 01
-          </p>
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Company:</span>{" "}
-            Advanced Composites &amp; Engineering Plastics
-          </p>
-        </div>
+          <div className="mx-3 border border-black sm:mx-6">
+            {/* ------------------------------------------------
+                NAME
+            ------------------------------------------------- */}
 
-        {/* HINDI INSTRUCTION */}
-        <div className="flex items-center gap-2 bg-[#6F4AE7]/5 px-5 py-3">
-          <span className="h-2 w-2 shrink-0 rounded-full bg-[#6F4AE7]" />
-          <p className="text-[12px] text-gray-600">
-            कृपया इस फॉर्म को धैर्यपूर्वक और ध्यानपूर्वक भरें।
-          </p>
-        </div>
-      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                  leading-5
+                "
+              >
+                Name of the Participant/Employee
+                <br />
+                (प्रतिभागी/कर्मचारी का नाम)
+              </div>
 
-      {/* PARTICIPANT / TRAINING DETAILS */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <BadgeOutlinedIcon sx={{ fontSize: 18 }} />
-          </div>
-          <h3 className="text-sm font-bold text-gray-900">
-            Participant / Training Details
-          </h3>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse">
-            <thead>
-              <tr className="bg-gray-100/80">
-                <th className="w-1/2 border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Particulars
-                </th>
-                <th className="border-b border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Details
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {DETAIL_FIELDS.map((field, index) => (
-                <tr
-                  key={field.key}
-                  className={`border-b border-gray-100 last:border-0 ${
-                    index % 2 === 1 ? "bg-gray-50/50" : "bg-white"
-                  }`}
-                >
-                  <td className="border-r border-gray-100 px-4 py-2.5 text-xs font-medium text-gray-600">
-                    {field.label}
-                  </td>
-                  <td className="px-4 py-2.5">
-                    {field.key === "date" ? (
-                      <input
-                        type="date"
-                        value={details[field.key]}
-                        onChange={handleDetailChange(field.key)}
-                        className={inputClass}
-                      />
-                    ) : (
-                      <input
-                        value={details[field.key]}
-                        onChange={handleDetailChange(field.key)}
-                        placeholder={`Enter ${field.label.split(" (")[0].toLowerCase()}`}
-                        className={inputClass}
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* TRAINING FEEDBACK REPORT */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-1 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <QuizOutlinedIcon sx={{ fontSize: 18 }} />
+              <input
+                type="text"
+                value={details.participant}
+                onChange={handleDetailChange("participant")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
             </div>
-            <h3 className="text-sm font-bold text-gray-900">
+
+            {/* ------------------------------------------------
+                UNIT
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Unit (यूनिट)
+              </div>
+
+              <input
+                type="text"
+                value={details.unit}
+                onChange={handleDetailChange("unit")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                DEPARTMENT
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Department (विभाग)
+              </div>
+
+              <input
+                type="text"
+                value={details.department}
+                onChange={handleDetailChange("department")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                DESIGNATION
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Designation (पदनाम)
+              </div>
+
+              <input
+                type="text"
+                value={details.designation}
+                onChange={handleDetailChange("designation")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                STAFF ID
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Staff ID (स्टाफ आईडी)
+              </div>
+
+              <input
+                type="text"
+                value={details.staffId}
+                onChange={handleDetailChange("staffId")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                EMAIL
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Email ID (ईमेल आईडी)
+              </div>
+
+              <input
+                type="text"
+                value={details.email}
+                onChange={handleDetailChange("email")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                TRAINING TITLE
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Title of the Training (प्रशिक्षण का शीर्षक)
+              </div>
+
+              <input
+                type="text"
+                value={details.trainingTitle}
+                onChange={handleDetailChange("trainingTitle")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                TRAINING DATE
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Date of Training (प्रशिक्षण की तिथि)
+              </div>
+
+              <input
+                type="text"
+                value={details.trainingDate}
+                onChange={handleDetailChange("trainingDate")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                TRAINING FACULTY
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  border-b
+                  sm:border-r
+                  border-black
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                  leading-5
+                "
+              >
+                Training Conducting Faculty
+                <br />
+                (प्रशिक्षण संचालित करने वाले प्रशिक्षक का नाम)
+              </div>
+
+              <input
+                type="text"
+                value={details.faculty}
+                onChange={handleDetailChange("faculty")}
+                className="
+                  border-b
+                  border-black
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+
+            {/* ------------------------------------------------
+                DURATION
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-[360px_1fr]">
+              <div
+                className="
+                  px-2
+                  py-[7px]
+                  text-[13px]
+                  font-semibold
+                "
+              >
+                Duration (From – To) प्रशिक्षण अवधि
+              </div>
+
+              <input
+                type="text"
+                value={details.duration}
+                onChange={handleDetailChange("duration")}
+                className="
+                  bg-transparent
+                  px-2
+                  text-[14px]
+                  outline-none
+                "
+              />
+            </div>
+          </div>
+
+          {/* ==================================================
+              TRAINING FEEDBACK REPORT TITLE
+          =================================================== */}
+
+          <div className="mt-3 text-center">
+            <h2 className="text-[21px] font-bold underline">
               Training Feedback Report
-            </h3>
+            </h2>
           </div>
-          <p className="text-xs text-gray-500">
-            Please rate the following points on a given scale. कृपया नीचे दिए
-            गए बिंदुओं को रेटिंग दें।
-          </p>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] border-collapse">
-            <thead>
-              <tr className="bg-gray-100/80">
-                <th className="w-14 border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  S. No.
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Evaluation Point
-                </th>
-                {RATING_OPTIONS.map((opt) => (
+          {/* ==================================================
+              FEEDBACK TABLE
+          =================================================== */}
+
+          <div className="mx-3 mt-1 overflow-x-auto sm:mx-6">
+            <table
+              className="
+                w-full
+                min-w-[700px]
+                table-fixed
+                border-collapse
+                border
+                border-black
+              "
+            >
+              {/* =================================================
+                  TABLE HEADER
+              ================================================== */}
+
+              <thead>
+                <tr>
+                  {/* QUESTION */}
                   <th
-                    key={opt}
-                    className="border-b border-r border-gray-200 px-2 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600 last:border-r-0"
+                    className="
+                      w-[53%]
+                      border
+                      border-black
+                      px-2
+                      py-3
+                      text-left
+                      text-[13px]
+                      font-bold
+                    "
                   >
-                    {opt}
+                    <div>
+                      Please rate the following points on a given scale.
+                    </div>
+
+                    <div className="mt-1 font-medium">
+                      कृपया नीचे दिए गए बिंदुओं को रेटिंग दें।
+                    </div>
                   </th>
-                ))}
-              </tr>
-            </thead>
 
-            <tbody>
-              {RATING_ROWS.map((point, index) => (
-                <tr
-                  key={index}
-                  className={`border-b border-gray-100 last:border-0 ${
-                    index % 2 === 1 ? "bg-gray-50/50" : "bg-white"
-                  }`}
-                >
-                  <td className="border-r border-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-700">
-                    {index + 1}
-                  </td>
-                  <td className="border-r border-gray-100 px-4 py-2.5">
-                    <p className="max-w-[340px] text-xs font-medium leading-5 text-gray-600">
-                      {point}
-                    </p>
-                  </td>
+                  {/* STRONGLY AGREE */}
+                  <th
+                    className="
+                      w-[9.4%]
+                      border
+                      border-black
+                      px-1
+                      py-2
+                      text-center
+                      text-[12px]
+                      font-bold
+                      leading-4
+                    "
+                  >
+                    Strongly
+                    <br />
+                    Agree
+                  </th>
 
-                  {RATING_OPTIONS.map((opt) => (
-                    <td
-                      key={opt}
-                      className="border-r border-gray-100 px-2 py-2.5 text-center last:border-r-0"
-                    >
-                      <label className="inline-flex cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`rating-${index}`}
-                          checked={ratings[index] === opt}
-                          onChange={() => handleRatingChange(index)(opt)}
-                          className="h-4 w-4 cursor-pointer accent-[#6F4AE7]"
-                        />
-                      </label>
-                    </td>
-                  ))}
+                  {/* AGREE */}
+                  <th
+                    className="
+                      w-[9.4%]
+                      border
+                      border-black
+                      px-1
+                      py-2
+                      text-center
+                      text-[12px]
+                      font-bold
+                    "
+                  >
+                    Agree
+                  </th>
+
+                  {/* DISAGREE */}
+                  <th
+                    className="
+                      w-[9.4%]
+                      border
+                      border-black
+                      px-1
+                      py-2
+                      text-center
+                      text-[12px]
+                      font-bold
+                    "
+                  >
+                    Disagree
+                  </th>
+
+                  {/* STRONGLY DISAGREE */}
+                  <th
+                    className="
+                      w-[9.4%]
+                      border
+                      border-black
+                      px-1
+                      py-2
+                      text-center
+                      text-[12px]
+                      font-bold
+                      leading-4
+                    "
+                  >
+                    Strongly
+                    <br />
+                    Disagree
+                  </th>
+
+                  {/* NOT RELEVANT */}
+                  <th
+                    className="
+                      w-[9.4%]
+                      border
+                      border-black
+                      px-1
+                      py-2
+                      text-center
+                      text-[12px]
+                      font-bold
+                      leading-4
+                    "
+                  >
+                    Not
+                    <br />
+                    relevant
+                    <br />
+                    to this
+                    <br />
+                    event
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              {/* =================================================
+                  TABLE BODY
+              ================================================== */}
+
+              <tbody>
+                {questions.map((question, index) => (
+                  <tr key={index}>
+                    {/* QUESTION */}
+                    <td
+                      className="
+                        border
+                        border-black
+                        px-2
+                        py-[6px]
+                        align-middle
+                        text-[12px]
+                        font-semibold
+                        leading-[15px]
+                      "
+                    >
+                      <div>
+                        {index + 1}. {question.english}
+                      </div>
+
+                      <div className="font-medium">({question.hindi})</div>
+                    </td>
+
+                    {/* STRONGLY AGREE */}
+                    <td
+                      onClick={() =>
+                        handleAnswerChange(index, "Strongly Agree")
+                      }
+                      className="
+                        h-[48px]
+                        cursor-pointer
+                        border
+                        border-black
+                        text-center
+                        align-middle
+                      "
+                    >
+                      {renderRatingMark(answers[index], "Strongly Agree")}
+                    </td>
+
+                    {/* AGREE */}
+                    <td
+                      onClick={() => handleAnswerChange(index, "Agree")}
+                      className="
+                        h-[48px]
+                        cursor-pointer
+                        border
+                        border-black
+                        text-center
+                        align-middle
+                      "
+                    >
+                      {renderRatingMark(answers[index], "Agree")}
+                    </td>
+
+                    {/* DISAGREE */}
+                    <td
+                      onClick={() => handleAnswerChange(index, "Disagree")}
+                      className="
+                        h-[48px]
+                        cursor-pointer
+                        border
+                        border-black
+                        text-center
+                        align-middle
+                      "
+                    >
+                      {renderRatingMark(answers[index], "Disagree")}
+                    </td>
+
+                    {/* STRONGLY DISAGREE */}
+                    <td
+                      onClick={() =>
+                        handleAnswerChange(index, "Strongly Disagree")
+                      }
+                      className="
+                        h-[48px]
+                        cursor-pointer
+                        border
+                        border-black
+                        text-center
+                        align-middle
+                      "
+                    >
+                      {renderRatingMark(answers[index], "Strongly Disagree")}
+                    </td>
+
+                    {/* NOT RELEVANT */}
+                    <td
+                      onClick={() => handleAnswerChange(index, "Not Relevant")}
+                      className="
+                        h-[48px]
+                        cursor-pointer
+                        border
+                        border-black
+                        text-center
+                        align-middle
+                      "
+                    >
+                      {renderRatingMark(answers[index], "Not Relevant")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ==================================================
+              SIGNATURE
+          =================================================== */}
+
+          <div className="flex justify-end px-4 pb-16 pt-10 sm:px-12 sm:pb-24 sm:pt-16">
+            <div className="text-right text-[13px] font-medium">
+              (Signature of participant/ &nbsp;प्रतिभागी के हस्ताक्षर)
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* SIGNATURE */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <EditNoteOutlinedIcon sx={{ fontSize: 18 }} />
-          </div>
-          <h3 className="text-sm font-bold text-gray-900">Signature</h3>
-        </div>
+      {/* ======================================================
+          PRINT CSS
+      ======================================================= */}
 
-        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex-1">
-            <label className="mb-1.5 block text-[11px] font-semibold text-gray-600">
-              Signature of participant / प्रतिभागी के हस्ताक्षर
-            </label>
-            <input
-              value={details.signature || ""}
-              onChange={(e) =>
-                setDetails((prev) => ({ ...prev, signature: e.target.value }))
-              }
-              placeholder="Enter participant signature"
-              className={`${inputClass} h-12`}
-            />
-          </div>
+      <style>
+        {`
+          @media print {
 
-          <button
-            type="button"
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-[#6F4AE7] px-6 text-xs font-semibold text-white shadow-sm transition hover:bg-[#5F3ED1]"
-          >
-            Submit Feedback
-          </button>
-        </div>
-      </div>
-    </div>
+            body {
+              margin: 0;
+              padding: 0;
+              background: white;
+            }
+
+            @page {
+              size: A4 portrait;
+              margin: 8mm;
+            }
+
+            .print\\:hidden {
+              display: none !important;
+            }
+
+            input {
+              color: black !important;
+              background: transparent !important;
+            }
+
+            * {
+              box-shadow: none !important;
+            }
+          }
+        `}
+      </style>
+    </>
   );
 };
 

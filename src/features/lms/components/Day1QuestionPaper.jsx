@@ -1,324 +1,457 @@
-import { useNavigate } from "react-router-dom";
-import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
-import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+﻿import { useState } from "react";
 import logo from "../../../assets/images/NTF_logo_black.png";
 
-const SECTIONS = [
-  {
-    name: "General Questions",
-    questions: [
-      { q: "कंपनी कब START हुई?", options: ["1990", "1984", "2000", "1980"] },
-      {
-        q: "कंपनी का MAIN प्लांट कहाँ है?",
-        options: ["Sanand Gujarat", "Neemrana", "IMT Manesar", "Delhi"],
-      },
-      {
-        q: "NTF की उत्पाद श्रेणी क्या है?",
-        options: ["Metal", "Plastic", "Plating", "Rubber"],
-      },
-      {
-        q: "NTF का पहला प्रोडक्ट कौन सा है?",
-        options: ["Hard Top", "Bumper", "Spoiler", "Roof Garnish"],
-      },
-      {
-        q: "NTF में कौन सा Process नहीं है?",
-        options: ["PIM", "Paint Shop", "Casting", "TCM"],
-      },
-      {
-        q: "निम्नलिखित में से कौन सा 5S नहीं है?",
-        options: ["Seiri", "Seiketsu", "Seiso", "Shitsuke"],
-      },
-      {
-        q: "काइज़न क्या है?",
-        options: ["निरंतर सुधार", "अंतरायिक सुधार", "[अस्पष्ट] सुधार", "सुधार रोकें"],
-      },
-      {
-        q: "पर्यावरण को क्या दूषित करता है?",
-        options: ["Waste", "Process", "Part", "Man"],
-      },
-    ],
-  },
-  {
-    name: "Safety Questions",
-    questions: [
-      { q: "आग कितने प्रकार की होती है?", options: ["3", "4", "5", "6"] },
-      {
-        q: "प्राथमिक चिकित्सा से क्या अभिप्राय है?",
-        options: [
-          "मरीज को दी जाने वाली पूर्व चिकित्सा",
-          "मरीज को दी जाने वाली अस्पताल चिकित्सा",
-          "दोनों हैं",
-          "इनमें से कोई नहीं",
-        ],
-      },
-      {
-        q: "निम्नलिखित में से कौन PPE किट का हिस्सा नहीं है?",
-        options: ["दस्ताने", "सुरक्षा चश्मा", "हेलमेट", "पेचकस"],
-      },
-      {
-        q: "फायर एक्सटिंगुइशर में PASS शब्द की क्रियाओं में इनमें से कौन-सा शब्द नहीं है?",
-        options: ["Pull", "Squeeze", "Alert", "Sweep"],
-      },
-      {
-        q: "ABC Type Fire Extinguisher को कौन-सी आग पर प्रयोग करेंगे?",
-        options: [
-          "हर प्रकार की आग पर",
-          "केवल बिजली के सामान पर",
-          "केवल लकड़ी की वस्तुओं पर",
-          "इनमें से कोई भी नहीं",
-        ],
-      },
-    ],
-  },
-  {
-    name: "Maintenance Questions",
-    questions: [
-      { q: "Maintenance क्या होता है?", options: [] },
-      {
-        q: "[फोटो में प्रश्न की लाइन स्पष्ट नहीं है]",
-        options: ["100", "440", "200", "50"],
-      },
-      {
-        q: "Break down maintenance क्या है?",
-        options: [
-          "First Maintenance",
-          "Maintenance when machine stops",
-          "Less Maintenance",
-          "None of above",
-        ],
-      },
-    ],
-  },
-  {
-    name: "Stores Questions",
-    questions: [
-      {
-        q: "FIFO से आप क्या समझते हैं?",
-        options: [
-          "First In First Out",
-          "Last In Last Out",
-          "Out First Out Last",
-          "Thermocompression",
-        ],
-      },
-      {
-        q: "मटेरियल इश्यू करते समय किन तीन चीजों का ध्यान रखना चाहिए?",
-        options: ["DATE", "SAFETY", "GRADE", "All of the above"],
-      },
-    ],
-  },
-  {
-    name: "Abnormality Handling",
-    questions: [
-      {
-        q: "बिजली जाने के दौरान बने हुए पार्ट की Handling:",
-        options: [
-          "बिजली जाने के दौरान बने हुए पार्ट को बिना मार्क किये ना रखें",
-          "बिजली जाने के दौरान बने हुए पार्ट को [कुछ शब्द अस्पष्ट] रखें",
-          "उपरोक्त दोनों कथन सही हैं",
-          "उपरोक्त दोनों कथन गलत हैं",
-        ],
-      },
-      {
-        q: "Inspection के दौरान Reject पार्ट की Handling:",
-        options: [
-          "Reject पार्ट को [अस्पष्ट] मार्क किये और लाल बिन के अलावा ना रखें",
-          "Reject पार्ट को हमेशा मार्क करके लाल बिन में रखें",
-          "उपरोक्त दोनों कथन सही हैं",
-          "उपरोक्त दोनों कथन गलत हैं",
-        ],
-      },
-    ],
-  },
-];
+const QUESTIONS = {
+  general: [
+    {
+      q: "कंपनी कब START हुई?",
+      options: ["1990", "1984", "2000", "1980"],
+    },
+    {
+      q: "कंपनी का MAIN प्लांट कहाँ है?",
+      options: ["Sanand Gujarat", "Neemrana", "IMT Manesar", "Delhi"],
+    },
+    {
+      q: "NTF की उत्पाद श्रेणी क्या है?",
+      options: ["Metal", "Plastic", "Plating", "Rubber"],
+    },
+    {
+      q: "NTF का पहला प्रोडक्ट कौन सा है?",
+      options: ["Hard Top", "Bumper", "Spoiler", "Roof Garnish"],
+    },
+    {
+      q: "NTF में कौन सा Process नहीं है?",
+      options: ["PIM", "Paint Shop", "Casting", "TCM"],
+    },
+    {
+      q: "निम्नलिखित में से कौन सा 5S नहीं है",
+      options: ["Seiri", "Seiketsu", "Seiso", "Shitsuke"],
+    },
+    {
+      q: "काइज़न क्या है?",
+      options: ["निरंतर सुधार", "अंतरायिक सुधार", "असंतत सुधार", "सुधार रोकें"],
+    },
+    {
+      q: "पर्यावरण को क्या दूषित करता है?",
+      options: ["Waste", "Process", "Part", "Man"],
+    },
+  ],
 
-const ALPHABET = ["a", "b", "c", "d", "e", "f"];
+  safety: [
+    {
+      q: "आग कितने प्रकार की होती है?",
+      options: ["3", "4", "5", "6"],
+    },
+    {
+      q: "प्राथमिक चिकित्सा से क्या अभिप्राय है?",
+      options: [
+        "मरीज को दी जाने वाली पूर्व चिकित्सा",
+        "मरीज को दी जाने वाली अस्पताल चिकित्सा",
+        "दोनों हैं",
+        "इनमें से कोई नहीं",
+      ],
+    },
+    {
+      q: "निम्नलिखित में से कौन PPE किट का हिस्सा नहीं है?",
+      options: ["दस्ताने", "सुरक्षा चश्मा", "हेलमेट", "पेचकस"],
+    },
+    {
+      q: "फायर एक्सटिंगुइशर में PASS शब्द की परिभाषा में इनमें से कौन सा शब्द नहीं है",
+      options: ["Pull", "Squeeze", "Alert", "Sweep"],
+    },
+    {
+      q: "ABC Type Fire Extinguisher को कौन-सी आग पर प्रयोग करेंगे?",
+      options: [
+        "हर प्रकार की आग पर",
+        "केवल बिजली के सामान पर",
+        "केवल लकड़ी की वस्तुओं पर",
+        "इनमें से कोई भी नहीं",
+      ],
+    },
+  ],
+
+  maintenance: [
+    {
+      q: "Maintenance क्या होता है?",
+      options: [],
+    },
+    {
+      q: "इंडस्ट्री में कितना वोल्टेज यूज़ करते हैं?",
+      options: ["100", "440", "200", "50"],
+    },
+    {
+      q: "Break down maintenance क्या है?",
+      options: [
+        "First Maintenance",
+        "Maintenance when machine stops",
+        "Last Maintenance",
+        "None of above",
+      ],
+    },
+  ],
+
+  stores: [
+    {
+      q: "FIFO से आप क्या समझते हो?",
+      options: [
+        "First In First Out",
+        "Last in Last Out",
+        "Out first Out last",
+        "Thermocompression",
+      ],
+    },
+    {
+      q: "मटेरियल इश्यू करते समय किन किन बातों का ध्यान रखना चाहिए?",
+      options: ["DATE", "SAFETY", "GRADE", "All of the above"],
+    },
+  ],
+
+  abnormality: [
+    {
+      q: "बिजली जाने के दौरान बने हुए पार्ट की हैंडलिंग:",
+      options: [
+        "बिजली जाने के दौरान बने हुए पार्ट को बिना मार्क किये ना रखें",
+        "बिजली जाने के दौरान बने हुए पार्ट को लाल बिन में रखें",
+        "उपरोक्त दोनों कथन सही हैं",
+        "उपरोक्त दोनों कथन गलत हैं",
+      ],
+    },
+    {
+      q: "Inspection के दौरान Reject पार्ट की हैंडलिंग:",
+      options: [
+        "Reject पार्ट को बिना मार्क किये और लाल बिन के बाहर ना रखें",
+        "Reject पार्ट को हमेशा मार्क करके लाल बिन में रखें",
+        "उपरोक्त दोनों कथन सही हैं",
+        "उपरोक्त दोनों कथन गलत हैं",
+      ],
+    },
+  ],
+};
+
+const ALPHABET = ["a", "b", "c", "d"];
 
 const Day1QuestionPaper = () => {
-  const navigate = useNavigate();
+  const [info, setInfo] = useState({
+    time: "30 मिनट",
+    date: "",
+    name: "",
+    designation: "",
+    unit: "",
+  });
+
+  // Change information fields
+  const handleInfoChange = (field) => (event) => {
+    setInfo({
+      ...info,
+      [field]: event.target.value,
+    });
+  };
+
+  // Question component
+  const Question = ({ number, question }) => {
+    return (
+      <div className="mb-5 break-inside-avoid">
+        <p className="text-[12px] font-medium leading-[1.4] text-black">
+          <span className="mr-1">{number}.</span>
+          {question.q}
+        </p>
+
+        {question.options.length > 0 ? (
+          <div className="mt-2 pl-4">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+              {question.options.map((option, index) => (
+                <div
+                  key={index}
+                  className="flex items-start text-[11px] leading-[1.4] text-black"
+                >
+                  <span className="mr-1">({ALPHABET[index]})</span>
+
+                  <span>{option}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="ml-4 mt-3 w-4/5 border-b border-dotted border-gray-500" />
+        )}
+      </div>
+    );
+  };
+
+  // Footer
+  const Footer = () => {
+    return (
+      <div className="mt-auto flex items-center justify-between px-2 pt-8 text-[10px] text-black">
+        <span>F18(AMD-02)</span>
+
+        <span>Rev. 00</span>
+      </div>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FB] print:bg-white">
-      <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-xs print:hidden">
-        <div className="h-14 px-4 sm:px-8 flex items-center justify-between max-w-5xl mx-auto gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <button
-              type="button"
-              onClick={() => navigate("/lms")}
-              className="h-9 w-9 rounded-xl bg-gray-100 text-gray-600 hover:bg-primary/10 hover:text-primary transition flex items-center justify-center shrink-0"
-              title="Back to LMS"
-            >
-              <ArrowBackOutlinedIcon sx={{ fontSize: 18 }} />
-            </button>
-            <div className="min-w-0">
-              <h1 className="text-sm font-bold text-gray-900 truncate leading-tight">
-                DOJO TEST PAPER – DAY-1
-              </h1>
-              <p className="text-[11px] text-gray-500 truncate">
-                Print-ready examination layout
-              </p>
+    <>
+      {/* PRINT BUTTON */}
+      <div className="mb-4 flex justify-end print:hidden">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="bg-black px-5 py-2 text-sm font-medium text-white hover:bg-gray-800"
+        >
+          Print
+        </button>
+      </div>
+
+      {/* =====================================================
+          PAGE 1
+      ====================================================== */}
+      <div className="mx-auto w-full max-w-[1100px] bg-white text-black print:max-w-none">
+        <div className="min-h-[1120px] px-[35px] py-[35px]">
+          {/* =====================================================
+              HEADER
+          ====================================================== */}
+          <div className="relative">
+            {/* NTF LOGO */}
+            <div className="absolute left-0 top-0">
+              <img
+                src={logo}
+                alt="NTF Logo"
+                className="h-[58px] w-auto object-contain"
+              />
+            </div>
+
+            {/* TITLE */}
+            <div className="pt-[40px] text-center">
+              <h1 className="text-[16px] font-bold">DOJO TEST PAPER- DAY-1</h1>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="h-9 rounded-xl bg-gradient-to-r from-primary to-primary-dark px-4 text-xs font-semibold text-white shadow-md shadow-primary/20 hover:opacity-95 transition flex items-center gap-1.5"
-          >
-            <PrintOutlinedIcon sx={{ fontSize: 15 }} />
-            Print
-          </button>
-        </div>
-      </div>
+          {/* =====================================================
+              INFORMATION BOX
+          ====================================================== */}
+          <div className="mt-4 border border-black px-5 py-4">
+            {/* MARKS */}
+            <div className="flex items-center text-[12px]">
+              <span>अंक -</span>
 
-      <div className="max-w-[760px] mx-auto px-4 py-6 print:p-0 print:max-w-none">
-        <div
-          className="bg-white shadow-xl rounded-2xl overflow-hidden print:shadow-none print:rounded-none"
-          style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}
-        >
-          <div className="p-8 sm:p-10 space-y-5 print:p-8">
-            <div className="flex items-start gap-5 pb-3 border-b border-gray-400">
-              <div className="shrink-0">
-                <img
-                  src={logo}
-                  alt="NTF Logo"
-                  className="h-12 w-auto object-contain"
+              <span className="ml-2">/ 20</span>
+            </div>
+
+            {/* PASSING INFORMATION */}
+            <p className="mt-4 text-[11px]">
+              (ऑब्जेक्टिव टेस्ट में पास होने के लिए 80% अंक लाना अनिवार्य है।)
+            </p>
+
+            {/* TIME + DATE */}
+            <div className="mt-4 grid grid-cols-2 text-[12px]">
+              {/* TIME */}
+              <div className="flex items-center">
+                <span>समय -</span>
+
+                <input
+                  type="text"
+                  value={info.time}
+                  onChange={handleInfoChange("time")}
+                  className="ml-2 w-[130px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
                 />
               </div>
 
-              <div className="flex-1 text-center">
-                <h1 className="text-lg font-black text-gray-900 uppercase tracking-wide leading-tight">
-                  DOJO TEST PAPER – DAY-1
-                </h1>
-                <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                  Skill Evaluation Test Paper
-                </p>
-              </div>
+              {/* DATE */}
+              <div className="flex items-center">
+                <span>दिनांक-</span>
 
-              <div className="shrink-0 text-right">
-                <p className="text-[11px] font-medium text-gray-800">
-                  अंक:{" "}
-                  <span className="text-gray-900 font-semibold">___ / 20</span>
-                </p>
+                <input
+                  type="text"
+                  value={info.date}
+                  onChange={handleInfoChange("date")}
+                  className="ml-2 w-[180px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+                />
               </div>
             </div>
 
-            <div className="border border-gray-300 rounded-lg p-4 space-y-2.5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-[11px] text-gray-800">
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    समय
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-300 pb-0.5 text-gray-900 font-medium">
-                    30 मिनट
-                  </span>
-                </div>
+            {/* NAME / DESIGNATION / UNIT */}
+            <div className="mt-5 flex items-center text-[12px]">
+              <span className="whitespace-nowrap">सदस्य का नाम</span>
 
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    दिनांक
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-300 pb-0.5" />
-                </div>
+              <input
+                type="text"
+                value={info.name}
+                onChange={handleInfoChange("name")}
+                className="mx-2 w-[250px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
 
-                <div className="flex items-center gap-2 sm:col-span-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    सदस्य का नाम
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5" />
-                </div>
+              <span className="whitespace-nowrap">क्वालिफिकेशन</span>
 
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    पद/डिजिग्नेशन
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5" />
-                </div>
+              <input
+                type="text"
+                value={info.designation}
+                onChange={handleInfoChange("designation")}
+                className="mx-2 w-[220px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
 
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    यूनिट नाम
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5" />
-                </div>
-              </div>
+              <span className="whitespace-nowrap">यूनिट नाम</span>
 
-              <p className="text-[11px] font-medium text-gray-700">
-                (ऑब्जेक्टिव टेस्ट में पास होने के लिए 80% अंक लाना अनिवार्य
-                है।)
-              </p>
+              <input
+                type="text"
+                value={info.unit}
+                onChange={handleInfoChange("unit")}
+                className="ml-2 w-[180px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
             </div>
-
-            {SECTIONS.map((section, sIdx) => {
-              const qs = section.questions;
-
-              return (
-                <div key={sIdx} className="space-y-4">
-                  <div className="relative flex items-center my-2">
-                    <div className="flex-1 h-px bg-gray-300" />
-                    <div className="mx-3 px-5 py-1 rounded-full border border-primary/40 bg-primary/5 text-[11px] font-bold text-primary uppercase tracking-widest shrink-0 print:border-gray-400 print:text-gray-800 print:bg-white">
-                      {section.name.toUpperCase()}
-                    </div>
-                    <div className="flex-1 h-px bg-gray-300" />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
-                    {qs.map((item, qIdx) => {
-                      const num =
-                        SECTIONS.slice(0, sIdx).reduce(
-                          (acc, s) => acc + s.questions.length,
-                          0
-                        ) +
-                        qIdx +
-                        1;
-
-                      return (
-                        <div key={qIdx} className="space-y-1.5 break-inside-avoid">
-                          <p className="text-[11px] font-semibold text-gray-900 leading-snug">
-                            <span className="mr-1">{num}.</span>
-                            {item.q}
-                          </p>
-
-                          {item.options.length > 0 ? (
-                            <div className="pl-4 space-y-1">
-                              {item.options.map((opt, oi) => (
-                                <div
-                                  key={oi}
-                                  className="flex items-start gap-1 text-[10.5px] leading-snug"
-                                >
-                                  <span className="shrink-0 font-medium">
-                                    {ALPHABET[oi]})
-                                  </span>
-                                  <span className="text-gray-700">{opt}</span>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="ml-4 w-4/5 border-b border-dotted border-gray-400 pb-0.5" />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
           </div>
+
+          {/* =====================================================
+              QUESTIONS
+          ====================================================== */}
+          <div className="mt-8 grid grid-cols-2 gap-x-[80px]">
+            {/* =================================================
+                LEFT COLUMN
+            ================================================== */}
+            <div>
+              {/* GENERAL QUESTIONS */}
+              <h2 className="mb-5 text-[16px] font-bold">General Questions:</h2>
+
+              <Question number={1} question={QUESTIONS.general[0]} />
+
+              <Question number={2} question={QUESTIONS.general[1]} />
+
+              <Question number={3} question={QUESTIONS.general[2]} />
+
+              <Question number={4} question={QUESTIONS.general[3]} />
+
+              <Question number={5} question={QUESTIONS.general[4]} />
+
+              <Question number={6} question={QUESTIONS.general[5]} />
+            </div>
+
+            {/* =================================================
+                RIGHT COLUMN
+            ================================================== */}
+            <div>
+              {/* SPACE TO ALIGN QUESTION 7 */}
+              <div className="h-[40px]" />
+
+              <Question number={7} question={QUESTIONS.general[6]} />
+
+              <Question number={8} question={QUESTIONS.general[7]} />
+
+              {/* SAFETY QUESTIONS */}
+              <h2 className="mb-5 mt-10 text-[16px] font-bold">
+                Safety Questions:
+              </h2>
+
+              <Question number={9} question={QUESTIONS.safety[0]} />
+
+              <Question number={10} question={QUESTIONS.safety[1]} />
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <Footer />
         </div>
       </div>
 
-      <style>{`
-        @media print {
-          body { background: white !important; }
-          .print\\:hidden { display: none !important; }
-        }
-      `}</style>
-    </div>
+      {/* =====================================================
+          PAGE 2
+      ====================================================== */}
+      <div className="mx-auto mt-8 w-full max-w-[1100px] bg-white text-black print:mt-0 print:max-w-none">
+        <div className="flex min-h-[1120px] flex-col px-[35px] py-[35px]">
+          {/* =====================================================
+              QUESTIONS PAGE 2
+          ====================================================== */}
+          <div className="grid grid-cols-2 gap-x-[80px]">
+            {/* =================================================
+                LEFT COLUMN
+            ================================================== */}
+            <div>
+              {/* QUESTION 11 */}
+              <Question number={11} question={QUESTIONS.safety[2]} />
+
+              {/* QUESTION 12 */}
+              <Question number={12} question={QUESTIONS.safety[3]} />
+
+              {/* QUESTION 13 */}
+              <Question number={13} question={QUESTIONS.safety[4]} />
+
+              {/* MAINTENANCE QUESTIONS */}
+              <h2 className="mb-5 mt-10 text-[16px] font-bold">
+                Maintenance Questions:
+              </h2>
+
+              <Question number={14} question={QUESTIONS.maintenance[0]} />
+
+              <Question number={15} question={QUESTIONS.maintenance[1]} />
+
+              <Question number={16} question={QUESTIONS.maintenance[2]} />
+            </div>
+
+            {/* =================================================
+                RIGHT COLUMN
+            ================================================== */}
+            <div>
+              {/* STORES QUESTIONS */}
+              <h2 className="mb-5 text-[16px] font-bold">Stores Questions:</h2>
+
+              <Question number={17} question={QUESTIONS.stores[0]} />
+
+              <Question number={18} question={QUESTIONS.stores[1]} />
+
+              {/* ABNORMALITY HANDLING */}
+              <h2 className="mb-5 mt-12 text-[16px] font-bold">
+                Abnormality Handling:
+              </h2>
+
+              <Question number={19} question={QUESTIONS.abnormality[0]} />
+
+              <Question number={20} question={QUESTIONS.abnormality[1]} />
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <Footer />
+        </div>
+      </div>
+
+      {/* =====================================================
+          PRINT CSS
+      ====================================================== */}
+      <style>
+        {`
+          @media print {
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+              background: white !important;
+            }
+
+            @page {
+              size: A4 portrait;
+              margin: 0;
+            }
+
+            input {
+              color: black !important;
+              background: transparent !important;
+            }
+
+            .print\\:hidden {
+              display: none !important;
+            }
+
+            .break-inside-avoid {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+
+            /* Keep second page separate */
+            .max-w-\\[1100px\\] + .max-w-\\[1100px\\] {
+              page-break-before: always;
+            }
+          }
+        `}
+      </style>
+    </>
   );
 };
 

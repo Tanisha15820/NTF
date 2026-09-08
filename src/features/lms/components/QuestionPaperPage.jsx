@@ -9,6 +9,7 @@ import QuestionSectionsCard from "./QuestionSectionsCard";
 import QuestionListCard from "./QuestionListCard";
 import QuestionForm from "./QuestionForm";
 import QuestionFooterStats from "./QuestionFooterStats";
+import { savePaperToStore } from "../utils/testPapers";
 import { lmsMenus } from "../data/LMSMenu";
 
 const DEFAULT_OPTIONS = [
@@ -163,6 +164,29 @@ const QuestionPaperPage = ({ level = "L0" }) => {
   };
 
   const saveAll = () => {
+    const paperId = getPaperId();
+
+    let meta = {};
+    try {
+      meta = JSON.parse(localStorage.getItem(`${storageKey}_meta`)) || {};
+    } catch {
+      /* ignore */
+    }
+
+    const passPercentage = Number(meta.passPercentage) || 80;
+
+    savePaperToStore({
+      id: paperId,
+      title: meta.testTitle || "UNTITLED TEST PAPER",
+      target: `${passPercentage}% or Above`,
+      testType: "Online",
+      course: meta.subTitle || meta.departments || "-",
+      passing: `${passPercentage}% or Above`,
+      marks: `${totalMarks} Marks`,
+      fullMarks: "Full Marks",
+      level,
+    });
+
     setSections((prev) =>
       prev.map((s) => ({
         ...s,
@@ -170,6 +194,19 @@ const QuestionPaperPage = ({ level = "L0" }) => {
       }))
     );
     showToast("Question paper saved successfully");
+  };
+
+  const getPaperId = () => {
+    try {
+      const key = `${storageKey}_paper_id`;
+      const existing = localStorage.getItem(key);
+      if (existing) return existing;
+      const id = `paper_${Date.now()}`;
+      localStorage.setItem(key, id);
+      return id;
+    } catch {
+      return `paper_${Date.now()}`;
+    }
   };
 
   const selectSection = (id) => {

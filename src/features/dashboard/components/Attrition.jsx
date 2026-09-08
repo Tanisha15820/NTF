@@ -37,37 +37,18 @@ const chartData = {
     {
       label: "Requirement",
       data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      backgroundColor: "#F59E0B",
+      backgroundColor: "#1D4ED8",
+
+      // Fixed thin bar width
+      barThickness: 22,
+
       borderRadius: {
         topLeft: 5,
         topRight: 5,
         bottomLeft: 0,
         bottomRight: 0,
       },
-      borderSkipped: "bottom",
-    },
-    {
-      label: "Present",
-      data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      backgroundColor: "#6F4AE7",
-      borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0,
-      },
-      borderSkipped: "bottom",
-    },
-    {
-      label: "Total",
-      data: [74, 94, 65, 109, 89, 52, 106, 74, 94, 65, 109, 89, 52, 106, 94, 78],
-      backgroundColor: "#06B6D4",
-      borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0,
-      },
+
       borderSkipped: "bottom",
     },
   ],
@@ -108,8 +89,8 @@ const options = {
       border: {
         display: false,
       },
-      barPercentage: 0.98,
-      categoryPercentage: 0.4,
+      barPercentage: 0.35,
+      categoryPercentage: 0.5,
       ticks: {
         color: "#64748B",
         font: {
@@ -148,7 +129,7 @@ const Attrition = () => {
         <div className="flex items-center justify-between">
           {/* Left side */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F46E5]">
+            <div className="w-9 h-9 rounded-lg bg-[#f9f7de] flex items-center justify-center text-[#dfa44a]">
               <PeopleAltIcon sx={{ fontSize: 20 }} />
             </div>
 

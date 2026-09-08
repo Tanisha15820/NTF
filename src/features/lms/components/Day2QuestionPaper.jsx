@@ -1,313 +1,454 @@
-import { useNavigate } from "react-router-dom";
-import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
-import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import { useState } from "react";
 import logo from "../../../assets/images/NTF_logo_black.png";
 
-const SECTIONS = [
-  {
-    name: "Process Questions: (Quality)",
-    questions: [
-      {
-        q: "पार्ट की कलर वैल्यू किस इंस्ट्रूमेंट से चेक करते हैं?",
-        options: ["हाईएस्ट गेज कैलिपर", "वर्नियर", "कलर मीटर", "माइक्रोमीटर"],
-      },
-      {
-        q: "पेंटेड पार्ट की DFT किस यंत्र से चेक करते हैं?",
-        options: ["Gloss मीटर", "टेपर स्केल", "DFT मीटर", "माइक्रोमीटर"],
-      },
-      {
-        q: "पार्ट की ग्लॉस वैल्यू कैसे चेक करते हैं?",
-        options: ["Gloss मीटर", "वर्नियर कैलिपर", "स्केल", "कलर मीटर"],
-      },
-    ],
+const QUESTIONS = {
+  1: {
+    q: "पार्ट की कलर वैल्यू किस इंस्ट्रूमेंट से चेक करते हैं?",
+    options: ["हाईएस्ट गेज कैलिपर", "वर्नियर", "कलर मीटर", "माइक्रोमीटर"],
   },
-  {
-    name: "Process Questions: (Plastic Injection Moulding)",
-    questions: [
-      {
-        q: "इंजेक्शन मोल्डिंग में इस्तेमाल किया मोल्ड कैसे ठंडा होता है?",
-        options: ["ठंडे सतह से संपर्क करें", "वायु", "पानी", "इनमें से कोई नहीं"],
-      },
-      {
-        q: "प्लास्टिक रॉ मटेरियल मशीन में कहाँ लोड होता है?",
-        options: ["हॉपर", "बैरल", "मोल्ड", "इनमें से कोई नहीं"],
-      },
-      {
-        q: "इंजेक्शन मोल्डिंग द्वारा निम्न में से कौनसी सामग्री नहीं बनाई गई है?",
-        options: ["नट्स", "कार बम्पर", "इलेक्ट्रिकल स्विच", "कुर्सी"],
-      },
-      {
-        q: "HRTC का प्रयोग किया जाता है?",
-        options: [
-          "मोल्ड को गर्म करने में",
-          "रनर को गर्म रखने में",
-          "पार्ट को गर्म करने में",
-          "मटेरियल को गर्म करने में",
-        ],
-      },
-      {
-        q: "PP मटेरियल का पूरा नाम क्या है?",
-        options: ["पॉली इथिलीन", "पॉली कार्बोनेट", "पॉली प्रोपलिन", "प्लास्टिक पॉलिमर"],
-      },
-    ],
-  },
-  {
-    name: "Process Questions: (Paint Shop)",
-    questions: [
-      {
-        q: "स्प्रे गन से पार्ट की दूरी कितनी होनी चाहिए?",
-        options: ["152–228 mm", "250–400 mm", "100–200 mm", "200–400 mm"],
-      },
-      {
-        q: "प्राइमर कोट की DFT कितनी माइक्रोन होनी चाहिए?",
-        options: ["8 से 14", "10 से 16", "12 से 18", "14 से 20"],
-      },
-      {
-        q: "असेम्बली करते समय किन-किन बातों का ध्यान देना चाहिए?",
-        options: [
-          "कोई Child part मिस ना हो",
-          "सबसे पहले ध्यान देना चाहिए कि कोई डिफेक्ट ना जाये।",
-          "दोनों हैं",
-          "इनमें से कोई नहीं।",
-        ],
-      },
-    ],
-  },
-  {
-    name: "Process Questions: (PU Rim)",
-    questions: [
-      {
-        q: "PU Rim में कौन सा मटेरियल यूज़ होता है?",
-        options: ["ABC", "PP", "N-66", "ISO/POLYOL"],
-      },
-      {
-        q: "PU Rim में कौन-कौन से डिफेक्ट आते हैं?",
-        options: ["बर्स", "एयर बबल", "पिन होल", "B & C"],
-      },
-    ],
-  },
-  {
-    name: "Process Questions: (TCM)",
-    questions: [
-      {
-        q: "TCM में यूज होने वाले RAW मटेरियल हैं।",
-        options: ["फॉम कोर", "पी यू", "प्लास्टिक ग्रेनुअल्स", "वुडस्टॉक, फैब्रिक, PPGF"],
-      },
-      {
-        q: "TCM में क्या-क्या प्रॉब्लम आ सकती हैं।",
-        options: ["सिल्वर स्टिक्स", "सिंक मार्क", "शार्ट मोल्डिंग", "उपरोक्त सभी"],
-      },
-      {
-        q: "फैब्रिक ka Material kya होता है।",
-        options: ["PVC", "प्लास्टिक का", "धागे का", "फाइबर का"],
-      },
-    ],
-  },
-  {
-    name: "Process Questions: (LB)",
-    questions: [
-      {
-        q: "L.F में उपयोग होने वाले मटेरियल का नाम लिखे।",
-        options: ["ISO & POLYOL", "फाइबर ग्लास", "सरफेस मैट", "उपरोक्त सभी"],
-      },
-      {
-        q: "LF process में कौन सा part बनाया जाता है?",
-        options: ["Spoiler", "Luggage Board", "Rear Parcel Tray", "Bumper"],
-      },
-      {
-        q: "फैब्रिक में क्या-क्या प्रॉब्लम आती हैं?",
-        options: ["ओवर GSM", "वाइट मार्क या लाइन मार्क", "अनइक्वल कटिंग", "उपरोक्त सभी"],
-      },
-      {
-        q: "LB में क्या-क्या डिफेक्ट्स आते हैं?",
-        options: ["पिन होल", "शॉर्ट मोल्डिंग", "एयर बबल", "उपरोक्त सभी"],
-      },
-    ],
-  },
-];
 
-const ALPHABET = ["a", "b", "c", "d", "e", "f"];
+  2: {
+    q: "पेंटेड पार्ट की DFT किस यंत्र से चेक करते हैं?",
+    options: ["Gloss मीटर", "टेपर स्केल", "DFT मीटर", "माइक्रोमीटर"],
+  },
 
-const Day2QuestionPaper = () => {
-  const navigate = useNavigate();
+  3: {
+    q: "पार्ट की ग्लॉस वैल्यू कैसे चेक करते हैं?",
+    options: ["Gloss मीटर", "वर्नियर कैलिपर", "स्केल", "कलर मीटर"],
+  },
+
+  4: {
+    q: "इंजेक्शन मोल्डिंग में इस्तेमाल किया मोल्ड कैसे ठंडा होता है?",
+    options: ["ठंडे सतह से संपर्क करें", "वायु", "पानी", "इनमें से कोई नहीं"],
+  },
+
+  5: {
+    q: "प्लास्टिक रॉ मटेरियल मशीन में कहाँ लोड होता हैं",
+    options: ["हॉपर", "बैरल", "मोल्ड", "इनमें से कोई नहीं"],
+  },
+
+  6: {
+    q: "इंजेक्शन मोल्डिंग द्वारा निम्न में से कौनसी सामग्री नहीं बनाई गई है?",
+    options: ["नट्स", "कार बम्पर", "इलेक्ट्रिकल स्विच", "कुर्सी"],
+  },
+
+  7: {
+    q: "HRTC का प्रयोग किया जाता है?",
+    options: [
+      "मोल्ड को गर्म करने में",
+      "रनर को गर्म रखने में",
+      "पार्ट को गर्म करने में",
+      "मटेरियल को गर्म करने में",
+    ],
+  },
+
+  8: {
+    q: "PP मटेरियल का पूरा नाम क्या है?",
+    options: [
+      "पॉली इथिलीन",
+      "पॉली कार्बोनेट",
+      "पॉली प्रोपलिन",
+      "प्लास्टिक पॉलिमर",
+    ],
+  },
+
+  9: {
+    q: "स्प्रे गन से पार्ट की दूरी कितनी होनी चाहिए?",
+    options: ["152-228 mm", "250-400 mm", "100-200 mm", "200-400 mm"],
+  },
+
+  10: {
+    q: "प्राइमर कोट की DFT कितनी माइक्रोन होनी चाहिए?",
+    options: ["8 से 14", "10 से 16", "12 से 18", "14 से 20"],
+  },
+
+  11: {
+    q: "असेम्बली करते समय किन-किन बातों का ध्यान देना चाहिए?",
+    options: [
+      "कोई Child part मिस ना हो",
+      "सबसे पहले ध्यान देना चाहिए कि कोई डिफेक्ट ना जाये।",
+      "दोनों हैं",
+      "इनमें से कोई नहीं।",
+    ],
+  },
+
+  12: {
+    q: "PU Rim में कौन सा मटेरियल यूज़ होता है?",
+    options: ["ABC", "PP", "N-66", "ISO/POLYOL"],
+  },
+
+  13: {
+    q: "PU Rim में कौन-कौन से डिफेक्ट आते हैं?",
+    options: ["बर्स", "एयर बबल", "पिन होल", "B & C"],
+  },
+
+  14: {
+    q: "TCM में यूज होने वाले RAW मटेरियल हैं।",
+    options: [
+      "फॉम कोर",
+      "पी यू",
+      "प्लास्टिक ग्रेनुअल्स",
+      "वुडस्टॉक, फैब्रिक, PPGF",
+    ],
+  },
+
+  15: {
+    q: "TCM में क्या-क्या प्रॉब्लम आ सकती हैं।",
+    options: ["सिल्वर स्टिक्स", "सिंक मार्क", "शार्ट मोल्डिंग", "उपरोक्त सभी"],
+  },
+
+  16: {
+    q: "फैब्रिक ka Material kya होता है।",
+    options: ["PVC", "प्लास्टिक का", "धागे का", "फाइबर का"],
+  },
+
+  17: {
+    q: "L.F में उपयोग होने वाले मटेरियल का नाम लिखे",
+    options: ["ISO & POLYOL", "फाइबर ग्लास", "सरफेस मैट", "उपरोक्त सभी"],
+  },
+
+  18: {
+    q: "LF process में कौन सा part बनाया जाता है",
+    options: ["Spoiler", "Luggage Board", "Rear Parcel Tray", "Bumper"],
+  },
+
+  19: {
+    q: "फैब्रिक में क्या-क्या प्रॉब्लम आती हैं?",
+    options: [
+      "ओवर GSM",
+      "वाइट मार्क या लाइन मार्क",
+      "अनइक्वल कटिंग",
+      "उपरोक्त सभी",
+    ],
+  },
+
+  20: {
+    q: "LB में क्या-क्या डिफेक्ट्स आते हैं :",
+    options: ["पिन होल", "शॉर्ट मोल्डिंग", "एयर बबल", "उपरोक्त सभी"],
+  },
+};
+
+const ALPHABET = ["a", "b", "c", "d"];
+
+// Question component
+const Question = ({ number }) => {
+  const question = QUESTIONS[number];
 
   return (
-    <div className="min-h-screen bg-[#F5F7FB] print:bg-white">
-      <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-xs print:hidden">
-        <div className="h-14 px-4 sm:px-8 flex items-center justify-between max-w-5xl mx-auto gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <button
-              type="button"
-              onClick={() => navigate("/lms")}
-              className="h-9 w-9 rounded-xl bg-gray-100 text-gray-600 hover:bg-primary/10 hover:text-primary transition flex items-center justify-center shrink-0"
-              title="Back to LMS"
+    <div className="mb-7 break-inside-avoid">
+      {/* Question */}
+      <p className="text-[12px] font-medium leading-[1.45] text-black">
+        <span className="mr-2">{number}.</span>
+        {question.q}
+      </p>
+
+      {/* Options */}
+      <div className="mt-3 pl-7">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+          {question.options.map((option, index) => (
+            <div
+              key={index}
+              className="flex items-start text-[11px] leading-[1.4] text-black"
             >
-              <ArrowBackOutlinedIcon sx={{ fontSize: 18 }} />
-            </button>
-            <div className="min-w-0">
-              <h1 className="text-sm font-bold text-gray-900 truncate leading-tight">
-                DOJO TEST PAPER – DAY-2
+              <span className="mr-1.5 shrink-0">({ALPHABET[index]})</span>
+
+              <span>{option}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Section heading
+const SectionHeading = ({ children }) => {
+  return (
+    <h2 className="mb-5 text-[15px] font-bold leading-tight text-black">
+      {children}
+    </h2>
+  );
+};
+
+// Footer
+const Footer = () => {
+  return (
+    <div className="mt-auto flex items-center justify-between px-1 pt-8 text-[10px] text-black">
+      <span>F18(AMD-02)</span>
+
+      <span>Rev. 00</span>
+    </div>
+  );
+};
+
+const Day2QuestionPaper = () => {
+  const [info, setInfo] = useState({
+    date: "",
+    name: "",
+    qualification: "",
+    unit: "",
+  });
+
+  // Handle input changes
+  const handleChange = (field) => (event) => {
+    setInfo({
+      ...info,
+      [field]: event.target.value,
+    });
+  };
+
+  return (
+    <>
+      {/* =====================================================
+          PRINT BUTTON
+      ====================================================== */}
+      <div className="mb-4 flex justify-end print:hidden">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="bg-black px-5 py-2 text-sm font-medium text-white hover:bg-gray-800"
+        >
+          Print
+        </button>
+      </div>
+
+      {/* =====================================================
+          PAGE 1
+      ====================================================== */}
+      <div className="mx-auto w-full max-w-[1100px] bg-white text-black print:max-w-none">
+        <div className="flex min-h-[1120px] flex-col px-[35px] py-[35px]">
+          {/* =================================================
+              HEADER
+          ================================================== */}
+          <div className="relative">
+            {/* NTF LOGO */}
+            <div className="absolute left-[25px] top-0">
+              <img
+                src={logo}
+                alt="NTF Logo"
+                className="h-[55px] w-auto object-contain"
+              />
+            </div>
+
+            {/* TITLE */}
+            <div className="pt-[42px] text-center">
+              <h1 className="text-[16px] font-bold uppercase">
+                DOJO TEST PAPER-DAY-2
               </h1>
-              <p className="text-[11px] text-gray-500 truncate">
-                Print-ready examination layout
-              </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="h-9 rounded-xl bg-gradient-to-r from-primary to-primary-dark px-4 text-xs font-semibold text-white shadow-md shadow-primary/20 hover:opacity-95 transition flex items-center gap-1.5"
-          >
-            <PrintOutlinedIcon sx={{ fontSize: 15 }} />
-            Print
-          </button>
-        </div>
-      </div>
+          {/* =================================================
+              INFORMATION BOX
+          ================================================== */}
+          <div className="mt-3 border border-black px-4 py-3">
+            {/* MARKS */}
+            <div className="text-[11px]">अंक - &nbsp;&nbsp; / 20</div>
 
-      <div className="max-w-[760px] mx-auto px-4 py-6 print:p-0 print:max-w-none">
-        <div
-          className="bg-white shadow-xl rounded-2xl overflow-hidden print:shadow-none print:rounded-none"
-          style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}
-        >
-          <div className="p-8 sm:p-10 space-y-5 print:p-8">
-            <div className="flex items-start gap-5 pb-3 border-b border-gray-400">
-              <div className="shrink-0">
-                <img
-                  src={logo}
-                  alt="NTF Logo"
-                  className="h-12 w-auto object-contain"
+            {/* PASSING INFORMATION */}
+            <p className="mt-4 text-[11px]">
+              (संकेत- टेस्ट में पास होने के लिए 80% अंक लाना अनिवार्य है।)
+            </p>
+
+            {/* TIME + DATE */}
+            <div className="mt-4 grid grid-cols-2 text-[11px]">
+              {/* TIME */}
+              <div className="flex items-center">
+                <span>समय - 30 मिनिट्स</span>
+              </div>
+
+              {/* DATE */}
+              <div className="flex items-center">
+                <span>दिनांक-</span>
+
+                <input
+                  type="text"
+                  value={info.date}
+                  onChange={handleChange("date")}
+                  className="ml-2 w-[180px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
                 />
               </div>
-
-              <div className="flex-1 text-center">
-                <h1 className="text-lg font-black text-gray-900 uppercase tracking-wide leading-tight">
-                  DOJO TEST PAPER – DAY-2
-                </h1>
-                <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                  Skill Evaluation Test Paper
-                </p>
-              </div>
-
-              <div className="shrink-0 text-right">
-                <p className="text-[11px] font-medium text-gray-800">
-                  अंक:{" "}
-                  <span className="text-gray-900 font-semibold">____ / 20</span>
-                </p>
-              </div>
             </div>
 
-            <div className="border border-gray-300 rounded-lg p-4 space-y-2.5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-[11px] text-gray-800">
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    समय
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-300 pb-0.5 text-gray-900 font-medium">
-                    30 मिनिट्स
-                  </span>
-                </div>
+            {/* NAME / QUALIFICATION / UNIT */}
+            <div className="mt-4 flex items-center text-[11px]">
+              <span className="whitespace-nowrap">सदस्य का नाम</span>
 
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    दिनांक
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-300 pb-0.5" />
-                </div>
+              <input
+                type="text"
+                value={info.name}
+                onChange={handleChange("name")}
+                className="mx-2 w-[240px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
 
-                <div className="flex items-center gap-2 sm:col-span-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    सदस्य का नाम
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5" />
-                </div>
+              <span className="whitespace-nowrap">क्वालिफिकेशन</span>
 
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    क्वालिफिकेशन
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5" />
-                </div>
+              <input
+                type="text"
+                value={info.qualification}
+                onChange={handleChange("qualification")}
+                className="mx-2 w-[220px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
 
-                <div className="flex items-center gap-2">
-                  <span className="w-28 font-semibold text-gray-700 shrink-0">
-                    यूनिट नाम
-                  </span>
-                  <span className="text-gray-500 shrink-0">:</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5" />
-                </div>
-              </div>
+              <span className="whitespace-nowrap">यूनिट नाम</span>
 
-              <p className="text-[11px] font-medium text-gray-700">
-                (संकेत- टेस्ट में पास होने के लिए 80% अंक लाना अनिवार्य है।)
-              </p>
+              <input
+                type="text"
+                value={info.unit}
+                onChange={handleChange("unit")}
+                className="ml-2 w-[180px] border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
             </div>
-
-            {SECTIONS.map((section, sIdx) => {
-              const qs = section.questions;
-
-              return (
-                <div key={sIdx} className="space-y-4">
-                  <div className="relative flex items-center my-2">
-                    <div className="flex-1 h-px bg-gray-300" />
-                    <div className="mx-3 px-5 py-1 rounded-full border border-primary/40 bg-primary/5 text-[11px] font-bold text-primary uppercase tracking-widest shrink-0 print:border-gray-400 print:text-gray-800 print:bg-white">
-                      {section.name.toUpperCase()}
-                    </div>
-                    <div className="flex-1 h-px bg-gray-300" />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
-                    {qs.map((item, qIdx) => {
-                      const num =
-                        SECTIONS.slice(0, sIdx).reduce(
-                          (acc, s) => acc + s.questions.length,
-                          0
-                        ) +
-                        qIdx +
-                        1;
-
-                      return (
-                        <div key={qIdx} className="space-y-1.5 break-inside-avoid">
-                          <p className="text-[11px] font-semibold text-gray-900 leading-snug">
-                            <span className="mr-1">{num}.</span>
-                            {item.q}
-                          </p>
-
-                          <div className="pl-4 space-y-1">
-                            {item.options.map((opt, oi) => (
-                              <div
-                                key={oi}
-                                className="flex items-start gap-1 text-[10.5px] leading-snug"
-                              >
-                                <span className="shrink-0 font-medium">
-                                  {ALPHABET[oi]})
-                                </span>
-                                <span className="text-gray-700">{opt}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
           </div>
+
+          {/* =================================================
+              QUESTIONS
+          ================================================== */}
+          <div className="mt-14 grid grid-cols-2 gap-x-[80px]">
+            {/* =================================================
+                LEFT COLUMN
+            ================================================== */}
+            <div>
+              {/* QUALITY */}
+              <SectionHeading>Process Questions: (Quality)</SectionHeading>
+
+              <Question number={1} />
+
+              <Question number={2} />
+
+              <Question number={3} />
+
+              {/* PLASTIC INJECTION */}
+              <SectionHeading>
+                Process Questions: (Plastic Injection Moulding)s
+              </SectionHeading>
+
+              <Question number={4} />
+            </div>
+
+            {/* =================================================
+                RIGHT COLUMN
+            ================================================== */}
+            <div>
+              {/* EMPTY SPACE TO ALIGN QUESTION 5 */}
+              <div className="h-[35px]" />
+
+              <Question number={5} />
+
+              <Question number={6} />
+
+              <Question number={7} />
+
+              <Question number={8} />
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <Footer />
         </div>
       </div>
 
-      <style>{`
-        @media print {
-          body { background: white !important; }
-          .print\\:hidden { display: none !important; }
-        }
-      `}</style>
-    </div>
+      {/* =====================================================
+          PAGE 2
+      ====================================================== */}
+      <div className="mx-auto mt-8 w-full max-w-[1100px] bg-white text-black print:mt-0 print:max-w-none">
+        <div className="flex min-h-[1120px] flex-col px-[35px] py-[35px]">
+          {/* =================================================
+              QUESTIONS
+          ================================================== */}
+          <div className="grid grid-cols-2 gap-x-[80px]">
+            {/* =================================================
+                LEFT COLUMN
+            ================================================== */}
+            <div>
+              {/* PAINT SHOP */}
+              <SectionHeading>Process Questions: (Paint Shop)</SectionHeading>
+
+              <Question number={9} />
+
+              <Question number={10} />
+
+              <Question number={11} />
+
+              {/* PU RIM */}
+              <SectionHeading>Process Questions: ( PU Rim )</SectionHeading>
+
+              <Question number={12} />
+
+              <Question number={13} />
+
+              {/* TCM */}
+              <SectionHeading>Process Questions: (TCM)</SectionHeading>
+
+              <Question number={14} />
+            </div>
+
+            {/* =================================================
+                RIGHT COLUMN
+            ================================================== */}
+            <div>
+              {/* TOP SPACE */}
+              <div className="h-[25px]" />
+
+              {/* QUESTION 15 */}
+              <Question number={15} />
+
+              {/* QUESTION 16 */}
+              <Question number={16} />
+
+              {/* LB */}
+              <SectionHeading>Process Questions: (LB)</SectionHeading>
+
+              <Question number={17} />
+
+              <Question number={18} />
+
+              <Question number={19} />
+
+              <Question number={20} />
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <Footer />
+        </div>
+      </div>
+
+      {/* =====================================================
+          PRINT CSS
+      ====================================================== */}
+      <style>
+        {`
+          @media print {
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+              background: white !important;
+            }
+
+            @page {
+              size: A4 portrait;
+              margin: 0;
+            }
+
+            input {
+              color: black !important;
+              background: transparent !important;
+            }
+
+            .print\\:hidden {
+              display: none !important;
+            }
+
+            .break-inside-avoid {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+          }
+        `}
+      </style>
+    </>
   );
 };
 

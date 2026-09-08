@@ -37,7 +37,9 @@ const chartData = {
     {
       label: "Female",
       data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
-      backgroundColor: "#EC4899",
+      backgroundColor: "#eb5199",
+      barThickness: 28,
+
       borderRadius: {
         topLeft: 5,
         topRight: 5,
@@ -49,7 +51,9 @@ const chartData = {
     {
       label: "Male",
       data: [30, 46, 24, 50, 40, 20, 45, 30, 46, 24, 50, 40, 20, 45, 46, 32],
-      backgroundColor: "#3B82F6",
+      backgroundColor: "#3a81f5",
+      barThickness: 28,
+
       borderRadius: {
         topLeft: 5,
         topRight: 5,
@@ -136,7 +140,7 @@ const GenderDistribution = () => {
         <div className="flex items-center justify-between">
           {/* Left side */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F46E5]">
+            <div className="w-9 h-9 rounded-lg bg-[#fdecf2] flex items-center justify-center text-[#e53c8f]">
               <PeopleAltIcon sx={{ fontSize: 20 }} />
             </div>
 

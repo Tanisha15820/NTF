@@ -1,273 +1,335 @@
 import { useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
-import ScoreboardOutlinedIcon from "@mui/icons-material/ScoreboardOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import logo from "../../../assets/images/NTF_logo_black.png";
 
 const EMPTY_ROW = {
-  partName: "",
   tactTime: "",
   actualTime: "",
-  trial: "",
-  ok: "",
-  ng: "",
-  status: "Pending",
+  status: "",
 };
 
-const PracticeEvaluationSheet = () => {
-  const [form, setForm] = useState({
+const PracticalEvaluation = () => {
+  // Evaluation rows
+  const [rows, setRows] = useState(
+    Array.from({ length: 10 }, () => ({ ...EMPTY_ROW })),
+  );
+
+  // Sheet information
+  const [details, setDetails] = useState({
     name: "",
     date: "",
     type: "",
+    partName: "",
+    processName: "",
   });
 
-  const [rows, setRows] = useState([{ ...EMPTY_ROW }]);
-
-  const handleFormChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+  // Change sheet details
+  const handleDetailChange = (field) => (event) => {
+    setDetails({
+      ...details,
+      [field]: event.target.value,
+    });
   };
 
+  // Change evaluation row
   const handleRowChange = (index, field) => (event) => {
-    setRows((prev) =>
-      prev.map((row, idx) =>
-        idx === index ? { ...row, [field]: event.target.value } : row
-      )
-    );
+    const updatedRows = [...rows];
+
+    updatedRows[index][field] = event.target.value;
+
+    setRows(updatedRows);
   };
 
+  // Add a new row
   const addRow = () => {
-    setRows((prev) => [...prev, { ...EMPTY_ROW }]);
+    setRows([...rows, { ...EMPTY_ROW }]);
   };
-
-  const removeRow = (index) => {
-    setRows((prev) =>
-      prev.length === 1 ? [{ ...EMPTY_ROW }] : prev.filter((_, idx) => idx !== index)
-    );
-  };
-
-  const inputClass =
-    "h-9 w-full rounded-lg border border-gray-200 bg-white px-3 text-xs text-gray-700 outline-none transition focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/10";
-
-  const labelClass = "mb-1.5 block text-[11px] font-semibold text-gray-600";
 
   return (
-    <div className="space-y-5">
-      {/* HEADER */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-gray-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary-dark shadow-sm">
-              <ScoreboardOutlinedIcon sx={{ color: "#fff", fontSize: 22 }} />
-            </div>
+    <>
+      {/* PRINT BUTTON + ADD BUTTON */}
+      <div className="mb-4 flex items-center justify-end gap-2 print:hidden">
+        <button
+          type="button"
+          onClick={addRow}
+          className="flex items-center gap-2 border border-gray-400 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          <AddOutlinedIcon sx={{ fontSize: 18 }} />
+          Add Row
+        </button>
 
-            <div>
-              <h2 className="text-base font-bold text-gray-900 leading-tight">
-                Practice Evaluation Sheet
-              </h2>
-              <p className="text-xs text-gray-500">
-                Record and evaluate hands-on practice performance of trainees
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={addRow}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#6F4AE7] px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-[#5F3ED1]"
-          >
-            <AddOutlinedIcon sx={{ fontSize: 18 }} />
-            Add Evaluation Row
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="flex items-center gap-2 bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+        >
+          <PrintOutlinedIcon sx={{ fontSize: 18 }} />
+          Print
+        </button>
       </div>
 
-      {/* EVALUATION DETAILS */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <EditNoteOutlinedIcon sx={{ fontSize: 18 }} />
-          </div>
-          <h3 className="text-sm font-bold text-gray-900">Evaluation Details</h3>
-        </div>
+      {/* MAIN SHEET */}
+      <div className="mx-auto w-full max-w-[1000px] bg-white p-3 text-black sm:p-5 print:max-w-none print:p-0">
+        {/* OUTER BORDER */}
+        <div className="border border-black">
+          {/* =====================================================
+              HEADER
+          ====================================================== */}
+          <div className="grid grid-cols-[90px_1fr] border-b border-black">
+            {/* NTF */}
+            <div className="flex items-center justify-center border-r border-black">
+              <div className="text-center">
+                <img
+                  src={logo}
+                  alt="NTF Logo"
+                  className="h-13 w-auto object-contain"
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-3">
-          <div>
-            <label className={labelClass}>Name</label>
-            <input
-              value={form.name}
-              onChange={handleFormChange("name")}
-              placeholder="Enter participant name"
-              className={inputClass}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Date</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={handleFormChange("date")}
-              className={inputClass}
-            />
+            {/* TITLE */}
+            <div className="flex items-center justify-center px-3 text-center">
+              <h1 className="text-lg font-bold tracking-wide sm:text-2xl">
+                PRACTICAL EVALUATION SHEET
+              </h1>
+            </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Type</label>
-            <input
-              value={form.type}
-              onChange={handleFormChange("type")}
-              placeholder="e.g. CNC / VMC / Manual"
-              className={inputClass}
-            />
+          {/* =====================================================
+              BASIC INFORMATION
+          ====================================================== */}
+          <div className="border-b border-black">
+            {/* NAME + DATE */}
+            <div className="grid grid-cols-1 sm:grid-cols-2">
+              {/* NAME */}
+              <div className="flex min-h-[45px] items-center border-b border-black px-3">
+                <label className="whitespace-nowrap text-sm font-medium">
+                  Name:
+                </label>
+
+                <input
+                  type="text"
+                  value={details.name}
+                  onChange={handleDetailChange("name")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 text-sm outline-none"
+                />
+              </div>
+
+              {/* DATE */}
+              <div className="flex min-h-[45px] items-center border-b border-black px-3">
+                <label className="whitespace-nowrap text-sm font-medium">
+                  Date:
+                </label>
+
+                <input
+                  type="text"
+                  value={details.date}
+                  onChange={handleDetailChange("date")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 text-sm outline-none"
+                />
+              </div>
+            </div>
+
+            {/* TYPE + PART NAME + PROCESS NAME */}
+            <div className="grid grid-cols-1 sm:grid-cols-3">
+              {/* TYPE */}
+              <div className="flex min-h-[45px] items-center border-b border-black px-3">
+                <label className="whitespace-nowrap text-sm font-medium">
+                  Type:
+                </label>
+
+                <input
+                  type="text"
+                  value={details.type}
+                  onChange={handleDetailChange("type")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 text-sm outline-none"
+                />
+              </div>
+
+              {/* PART NAME */}
+              <div className="flex min-h-[45px] items-center border-b border-black px-3">
+                <label className="whitespace-nowrap text-sm font-medium">
+                  Part Name:
+                </label>
+
+                <input
+                  type="text"
+                  value={details.partName}
+                  onChange={handleDetailChange("partName")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 text-sm outline-none"
+                />
+              </div>
+
+              {/* PROCESS NAME */}
+              <div className="flex min-h-[45px] items-center border-b border-black px-3">
+                <label className="whitespace-nowrap text-sm font-medium">
+                  Process Name:
+                </label>
+
+                <input
+                  type="text"
+                  value={details.processName}
+                  onChange={handleDetailChange("processName")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 text-sm outline-none"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* EVALUATION TABLE */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-1 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-gray-900">Evaluation Entries</h3>
-            <p className="text-xs text-gray-500">
-              List the parts / processes practised during the session
-            </p>
-          </div>
-          <p className="text-xs text-gray-500">
-            Total entries:{" "}
-            <span className="font-semibold text-[#6F4AE7]">{rows.length}</span>
-          </p>
-        </div>
+          {/* =====================================================
+              EVALUATION TABLE
+          ====================================================== */}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px] border-collapse">
+              {/* TABLE HEADER */}
+              <thead>
+                <tr>
+                  {/* SR NO */}
+                  <th
+                    rowSpan="2"
+                    className="w-[80px] border-r border-black px-2 py-3 text-center text-sm font-bold"
+                  >
+                    Sr. No.
+                  </th>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] border-collapse">
-            <thead>
-              <tr className="bg-gray-100/80">
-                <th className="w-14 border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  S. No.
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Part Name / Process Name
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Tact Time / Sec.
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Actual Time / Sec.
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Process Name / Trial (Operator)
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  OK
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  NG
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Status
-                </th>
-                <th className="w-14 border-b border-gray-200 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  &nbsp;
-                </th>
-              </tr>
-            </thead>
+                  {/* TACT TIME */}
+                  <th
+                    rowSpan="2"
+                    className="w-[220px] border-r border-black px-2 py-3 text-center text-sm font-bold"
+                  >
+                    Tact Time (Std.) Sec.
+                  </th>
 
-            <tbody>
-              {rows.map((row, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 last:border-0 hover:bg-primary/5"
-                >
-                  <td className="border-r border-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-700">
-                    {index + 1}
-                  </td>
+                  {/* ACTUAL TIME */}
+                  <th
+                    rowSpan="2"
+                    className="w-[330px] border-r border-black px-2 py-3 text-center text-sm font-bold"
+                  >
+                    Actual Time Taken (New Operator)
+                  </th>
 
-                  {[
-                    ["partName", "Part name"],
-                    ["tactTime", "Tact time"],
-                    ["actualTime", "Actual time"],
-                    ["trial", "Trial / operator"],
-                  ].map(([field, placeholder]) => (
-                    <td
-                      key={field}
-                      className="border-r border-gray-100 px-4 py-2.5"
-                    >
+                  {/* STATUS */}
+                  <th
+                    colSpan="2"
+                    className="border-b border-black px-2 py-2 text-center text-sm font-bold"
+                  >
+                    Status
+                  </th>
+                </tr>
+
+                <tr>
+                  {/* OK */}
+                  <th className="w-[90px] border-r border-black px-2 py-2 text-center text-sm font-bold">
+                    OK
+                  </th>
+
+                  {/* NG */}
+                  <th className="w-[90px] px-2 py-2 text-center text-sm font-bold">
+                    NG
+                  </th>
+                </tr>
+              </thead>
+
+              {/* TABLE BODY */}
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={index}>
+                    {/* SR NO */}
+                    <td className="h-[55px] border-r border-t border-black px-2 text-center text-sm">
+                      {index + 1}
+                    </td>
+
+                    {/* TACT TIME */}
+                    <td className="border-r border-t border-black px-2">
                       <input
-                        value={row[field]}
-                        onChange={handleRowChange(index, field)}
-                        placeholder={placeholder}
-                        className={inputClass}
+                        type="text"
+                        value={row.tactTime}
+                        onChange={handleRowChange(index, "tactTime")}
+                        className="w-full border-0 bg-transparent text-center text-sm outline-none"
                       />
                     </td>
-                  ))}
 
-                  <td className="border-r border-gray-100 px-4 py-2.5 text-center">
-                    <input
-                      value={row.ok}
-                      onChange={handleRowChange(index, "ok")}
-                      placeholder="—"
-                      className={`${inputClass} w-14 text-center`}
-                    />
-                  </td>
+                    {/* ACTUAL TIME */}
+                    <td className="border-r border-t border-black px-2">
+                      <input
+                        type="text"
+                        value={row.actualTime}
+                        onChange={handleRowChange(index, "actualTime")}
+                        className="w-full border-0 bg-transparent text-center text-sm outline-none"
+                      />
+                    </td>
 
-                  <td className="border-r border-gray-100 px-4 py-2.5 text-center">
-                    <input
-                      value={row.ng}
-                      onChange={handleRowChange(index, "ng")}
-                      placeholder="—"
-                      className={`${inputClass} w-14 text-center`}
-                    />
-                  </td>
+                    {/* OK */}
+                    <td className="border-r border-t border-black text-center">
+                      <input
+                        type="radio"
+                        name={`status-${index}`}
+                        value="OK"
+                        checked={row.status === "OK"}
+                        onChange={handleRowChange(index, "status")}
+                        className="h-4 w-4 cursor-pointer"
+                      />
+                    </td>
 
-                  <td className="border-r border-gray-100 px-4 py-2.5">
-                    <select
-                      value={row.status}
-                      onChange={handleRowChange(index, "status")}
-                      className={inputClass}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Pass">Pass</option>
-                      <option value="Fail">Fail</option>
-                      <option value="In Progress">In Progress</option>
-                    </select>
-                  </td>
+                    {/* NG */}
+                    <td className="border-t border-black text-center">
+                      <input
+                        type="radio"
+                        name={`status-${index}`}
+                        value="NG"
+                        checked={row.status === "NG"}
+                        onChange={handleRowChange(index, "status")}
+                        className="h-4 w-4 cursor-pointer"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-                  <td className="px-4 py-2.5 text-center">
-                    <button
-                      type="button"
-                      onClick={() => removeRow(index)}
-                      title="Remove row"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-red-50 hover:text-red-500"
-                    >
-                      <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          {/* =====================================================
+              FOOTER
+          ====================================================== */}
+          <div className="flex justify-end border-t border-black px-4 py-3">
+            <span className="text-xs font-medium">F19 (A.MD-02)</span>
 
-        <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
-          <p className="text-xs text-gray-500">
-            Mark each trial as{" "}
-            <span className="font-semibold text-emerald-500">OK</span> /{" "}
-            <span className="font-semibold text-red-500">NG</span> and update the
-            status
-          </p>
-
-          <button
-            type="button"
-            onClick={addRow}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#E5E7EB] px-4 text-xs font-semibold text-[#6F4AE7] transition hover:border-[#6F4AE7] hover:bg-[#6F4AE7]/5"
-          >
-            <AddOutlinedIcon sx={{ fontSize: 18 }} />
-            Add Row
-          </button>
+            <span className="ml-10 text-xs font-medium">Rev.00</span>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* =====================================================
+          PRINT CSS
+      ====================================================== */}
+      <style>
+        {`
+          @media print {
+            body {
+              margin: 0;
+              padding: 0;
+              background: white;
+            }
+
+            .print\\:hidden {
+              display: none !important;
+            }
+
+            input {
+              color: black !important;
+              background: transparent !important;
+            }
+
+            @page {
+              size: A4 portrait;
+              margin: 8mm;
+            }
+          }
+        `}
+      </style>
+    </>
   );
 };
 
-export default PracticeEvaluationSheet;
+export default PracticalEvaluation;

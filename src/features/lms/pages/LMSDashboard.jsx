@@ -7,13 +7,13 @@ import Sidebar from "../../../components/Sidebar";
 import Navbar from "../../../components/Navbar";
 import KPICards from "../../../components/KPICards";
 import Filters from "../../../components/Filters";
-import OperatorTraining from "../components/OperatorTraining";
+// import OperatorTraining from "../components/OperatorTraining";
 import { lmsMenus } from "../data/LMSMenu";
-import TrainingPlan from "../components/TrainingPlan";
-import ManRelatedDefects from "../components/ManRelatedDefects";
-import TrainingPlanActual from "../components/TrainingPlanActual";
-import ManPowerTrend from "../components/ManpowerTrend";
-import AttritionAbsentism from "../components/AttritionAbsentism";
+// import TrainingPlan from "../components/TrainingPlan";
+// import ManRelatedDefects from "../components/ManRelatedDefects";
+// import TrainingPlanActual from "../components/TrainingPlanActual";
+// import ManPowerTrend from "../components/ManpowerTrend";
+// import AttritionAbsentism from "../components/AttritionAbsentism";
 
 const kpiData = [
   {
@@ -67,12 +67,12 @@ const LMSDashboard = () => {
         <main className="flex-1 overflow-y-auto px-6 pt-5 pb-8 space-y-6">
           <KPICards data={kpiData} />
           <Filters />
-          <OperatorTraining />
+          {/* <OperatorTraining />
           <TrainingPlan />
           <ManRelatedDefects />
           <TrainingPlanActual />
           <ManPowerTrend />
-          <AttritionAbsentism />
+          <AttritionAbsentism /> */}
         </main>
       </div>
     </div>

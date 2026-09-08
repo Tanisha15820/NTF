@@ -4,6 +4,8 @@ import Sidebar from "../../../components/Sidebar";
 import Navbar from "../../../components/Navbar";
 import QuestionPaperTable from "../components/QuestionPaperTable";
 import TrainingSchedule from "../components/TrainingSchedule";
+import Day1QuestionPaper from "../components/Day1QuestionPaper";
+import Day2QuestionPaper from "../components/Day2QuestionPaper";
 import PracticeEvaluationSheet from "../components/PracticeEvaluationSheet";
 import TrainingFeedback from "../components/TrainingFeedback";
 import LMSTabs from "../components/LMSTabs";
@@ -31,14 +33,6 @@ const LMS = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-
-    if (tab === "Day 1") {
-      navigate("/lms/l0");
-    }
-
-    if (tab === "Day 2") {
-      navigate("/lms/l1");
-    }
   };
 
   return (
@@ -72,6 +66,10 @@ const LMS = () => {
           )}
 
           {activeTab === "Training Schedule" && <TrainingSchedule />}
+
+          {activeTab === "Day 1" && <Day1QuestionPaper />}
+
+          {activeTab === "Day 2" && <Day2QuestionPaper />}
 
           {activeTab === "Practice Evaluation Sheet" && (
             <PracticeEvaluationSheet />

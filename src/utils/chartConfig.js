@@ -1,3 +1,22 @@
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels,
+);
+
 export const CHART_COLORS = {
   primary: "#6F4AE7",
   primaryLight: "#7A5AF8",
@@ -50,75 +69,51 @@ export const getBarChartOptions = ({
       mode: "index",
       intersect: false,
     },
-    plugins: {
-      legend: {
-        position: legendPosition,
-        align: legendAlign,
-        labels: {
-          usePointStyle: true,
-          pointStyle: "circle",
-          padding: 20,
-          boxWidth: 8,
-          boxHeight: 8,
-          color: "#475569",
-          font: {
-            size: 12,
-            weight: "600",
-            family:
-              "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          },
-        },
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#1E293B",
-        titleColor: "#FFFFFF",
-        bodyColor: "#FFFFFF",
-        borderColor: "rgba(255, 255, 255, 0.08)",
-        borderWidth: 1,
-        padding: {
-          top: 10,
-          bottom: 10,
-          left: 14,
-          right: 14,
-        },
-        cornerRadius: 10,
-        boxPadding: 6,
+  plugins: {
+    legend: {
+      position: legendPosition,
+      align: legendAlign,
+      labels: {
         usePointStyle: true,
-        titleFont: {
+        pointStyle: "circle",
+        padding: 20,
+        boxWidth: 8,
+        boxHeight: 8,
+        color: "#475569",
+        font: {
           size: 12,
-          weight: "700",
-          family: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-        },
-        bodyFont: {
-          size: 12,
-          weight: "500",
-          family: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-        },
-        callbacks: {
-          labelColor: function (context) {
-            return {
-              borderColor: "transparent",
-              backgroundColor: context.dataset.backgroundColor || "#6F4AE7",
-              borderRadius: 4,
-            };
-          },
-          ...(yAxisFormatter
-            ? {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) label += ": ";
-                  if (context.parsed.y !== null) {
-                    label += yAxisFormatter(context.parsed.y);
-                  }
-                  return label;
-                },
-              }
-            : {}),
+          weight: "600",
+          family:
+            "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         },
       },
     },
-    scales: {
+    tooltip: {
+      enabled: false,
+      external: () => {},
+    },
+    datalabels: {
+      display: true,
+      anchor: "end",
+      align: "top",
+      offset: 4,
+      color: "#334155",
+      font: {
+        size: 10,
+        weight: "600",
+        family: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      },
+      formatter: (value, ctx) => {
+        if (yAxisFormatter) {
+          return yAxisFormatter(value);
+        }
+        return ctx.chart.data.datasets[ctx.datasetIndex]?.label
+          ? value
+          : value;
+      },
+    },
+  },
+  scales: {
       x: {
         stacked: stacked,
         offset: true,

@@ -8,9 +8,17 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Bar } from "react-chartjs-2";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels,
+);
 
 // Chart labels
 const labels = [
@@ -32,7 +40,7 @@ const chartData = {
 
   datasets: [
     {
-      label: "Present",
+      label: "Actual",
       data: [45, 60, 32, 58, 48, 25, 62, 40, 55, 28],
       backgroundColor: "#4285F4",
 
@@ -49,7 +57,7 @@ const chartData = {
     },
 
     {
-      label: "Absent",
+      label: "Present",
       data: [25, 35, 18, 40, 28, 15, 30, 22, 32, 20],
       backgroundColor: "#26B7A0",
 
@@ -64,10 +72,9 @@ const chartData = {
     },
 
     {
-      label: "Total",
+      label: "Requirement",
       data: [70, 95, 50, 98, 76, 40, 92, 62, 87, 48],
       backgroundColor: "#FFB52E",
-
       borderRadius: {
         topLeft: 5,
         topRight: 5,
@@ -96,21 +103,24 @@ const options = {
     },
 
     tooltip: {
-      backgroundColor: "#1E293B",
-      titleColor: "#FFFFFF",
-      bodyColor: "#FFFFFF",
-      padding: 10,
-      cornerRadius: 8,
-      displayColors: true,
+      enabled: false,
+      external: () => {},
+    },
 
-      callbacks: {
-        label: function (context) {
-          return ` ${context.dataset.label}: ${context.raw}`;
-        },
+    datalabels: {
+      display: true,
+      anchor: "end",
+      align: "top",
+      offset: 4,
+      color: "#334155",
+      font: {
+        size: 10,
+        weight: "600",
+        family: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       },
+      formatter: (value) => value,
     },
   },
-
   scales: {
     x: {
       offset: true,
@@ -125,7 +135,7 @@ const options = {
       },
 
       // 3 bars almost touching
-      barPercentage: 0.98,
+      barPercentage: 0.3,
 
       // Groups clearly separated
       categoryPercentage: 0.4,
@@ -222,7 +232,7 @@ const DailyManpower = () => {
             <span className="w-2 h-2 rounded-full bg-[#4285F4]"></span>
 
             <span className="text-[9px] font-medium text-slate-500">
-              Present
+              Actual
             </span>
           </div>
 
@@ -231,7 +241,7 @@ const DailyManpower = () => {
             <span className="w-2 h-2 rounded-full bg-[#26B7A0]"></span>
 
             <span className="text-[9px] font-medium text-slate-500">
-              Absent
+              Present
             </span>
           </div>
 
@@ -239,7 +249,9 @@ const DailyManpower = () => {
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#FFB52E]"></span>
 
-            <span className="text-[9px] font-medium text-slate-500">Total</span>
+            <span className="text-[9px] font-medium text-slate-500">
+              Requirement
+            </span>
           </div>
         </div>
       </div>

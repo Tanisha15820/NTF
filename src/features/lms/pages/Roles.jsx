@@ -17,11 +17,13 @@ import {
   Edit3,
   Eye,
   Trash2,
+  Upload,
+  X,
 } from "lucide-react";
 
-const permissionActions = ["View", "Create", "Edit", "Delete"];
+const permissionActions = ["View", "Upload Excel", "Create", "Edit", "Delete"];
 
-const rolesData = [
+const DEFAULT_ROLES = [
   {
     id: 1,
     name: "Admin",
@@ -49,48 +51,81 @@ const moduleData = [
     id: "dashboard",
     title: "Dashboard",
     description: "Access to dashboard and analytics",
+    category: "Dashboard",
     icon: LayoutDashboard,
     color: "#3b82f6",
     permissions: ["Access"],
   },
   {
-    id: "courses",
-    title: "Courses",
+    id: "attendance",
+    title: "Attendance",
     description: "Manage courses and learning content",
+    category: "Dashboard",
     icon: BookOpen,
     color: "#10b981",
     permissions: ["Access"],
   },
   {
-    id: "department",
-    title: "Department",
+    id: "requirement",
+    title: "Requirement",
     description: "Manage department hierarchy",
+    category: "Dashboard",
     icon: Building2,
     color: "#f59e0b",
     permissions: ["Access"],
   },
   {
-    id: "employees",
-    title: "Employees",
+    id: "dashboard",
+    title: "Dashboard",
     description: "Employee information management",
+    category: "LMS",
     icon: Users,
     color: "#f43f5e",
     permissions: ["Access"],
   },
   {
-    id: "operators",
-    title: "Operators",
+    id: "dojo-hiring",
+    title: "DOJO Hiring",
     description: "Manage operational users",
+    category: "LMS",
     icon: UserCog,
     color: "#06b6d4",
     permissions: ["Access"],
   },
   {
-    id: "test-paper",
-    title: "Test Paper",
+    id: "department",
+    title: "Department",
     description: "Create and manage test papers",
+    category: "LMS",
     icon: FileText,
     color: "#f97316",
+    permissions: ["Access"],
+  },
+  {
+    id: "operators",
+    title: "Operators",
+    description: "Access to dashboard and analytics",
+    category: "LMS",
+    icon: LayoutDashboard,
+    color: "#3b82f6",
+    permissions: ["Access"],
+  },
+  {
+    id: "users",
+    title: "Users",
+    description: "Manage courses and learning content",
+    category: "LMS",
+    icon: BookOpen,
+    color: "#10b981",
+    permissions: ["Access"],
+  },
+  {
+    id: "roles-and-permissions",
+    title: "Roles & Permissions",
+    description: "Manage department hierarchy",
+    category: "LMS",
+    icon: Building2,
+    color: "#f59e0b",
     permissions: ["Access"],
   },
 ];
@@ -103,6 +138,7 @@ const defaultPageAccess = moduleData.reduce((acc, module) => {
 
 const defaultPermissions = {
   View: true,
+  "Upload Excel": true,
   Create: true,
   Edit: true,
   Delete: true,
@@ -113,6 +149,11 @@ const actionMeta = {
     icon: Eye,
     color: "#3b82f6",
     description: "Can view and read data",
+  },
+  "Upload Excel": {
+    icon: Upload,
+    color: "#06b6d4",
+    description: "Can upload excel files",
   },
   Create: {
     icon: Plus,
@@ -131,11 +172,23 @@ const actionMeta = {
   },
 };
 
+const ROLE_COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#f43f5e",
+  "#06b6d4",
+  "#8b5cf6",
+  "#f97316",
+];
+
 const Roles = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   const [activeMenu, setActiveMenu] = useState("Roles & Permissions");
+
+  const [roles, setRoles] = useState(DEFAULT_ROLES);
 
   const [selectedRoleId, setSelectedRoleId] = useState(null);
 
@@ -151,10 +204,18 @@ const Roles = () => {
 
   const [roleStatus, setRoleStatus] = useState(true);
 
-  const selectedRole =
-    rolesData.find((role) => role.id === selectedRoleId) || null;
+  const [showNewRoleModal, setShowNewRoleModal] = useState(false);
 
-  const filteredRoles = rolesData.filter((role) =>
+  const [newRoleName, setNewRoleName] = useState("");
+
+  const [newRoleDescription, setNewRoleDescription] = useState("");
+
+  const [newRoleType, setNewRoleType] = useState("Custom");
+
+  const selectedRole =
+    roles.find((role) => role.id === selectedRoleId) || null;
+
+  const filteredRoles = roles.filter((role) =>
     role.name.toLowerCase().includes(searchRole.toLowerCase()),
   );
 
@@ -166,6 +227,16 @@ const Roles = () => {
       module.description.toLowerCase().includes(value)
     );
   });
+
+  const groupedModules = filteredModules.reduce((acc, module) => {
+    const category = module.category || "Other";
+
+    if (!acc[category]) acc[category] = [];
+
+    acc[category].push(module);
+
+    return acc;
+  }, {});
 
   const togglePage = (moduleId) => {
     setPageAccess((prev) => ({
@@ -199,6 +270,49 @@ const Roles = () => {
     });
 
     setPermissions(updated);
+  };
+
+  const openNewRoleModal = () => {
+    setNewRoleName("");
+    setNewRoleDescription("");
+    setNewRoleType("Custom");
+    setShowNewRoleModal(true);
+  };
+
+  const createRole = (e) => {
+    e.preventDefault();
+
+    const name = newRoleName.trim();
+
+    if (!name) return;
+
+    const shortName = name
+      .split(/\s+/)
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+    const nextId = roles.reduce((max, role) => Math.max(max, role.id), 0) + 1;
+
+    const newRole = {
+      id: nextId,
+      name,
+      shortName,
+      icon: UserCog,
+      color:
+        ROLE_COLORS[roles.length % ROLE_COLORS.length],
+      users: 0,
+      type: newRoleType,
+      description:
+        newRoleDescription.trim() ||
+        "Custom role with configurable access",
+    };
+
+    setRoles((prev) => [...prev, newRole]);
+    setSelectedRoleId(nextId);
+    setActiveTab("Permissions");
+    setShowNewRoleModal(false);
   };
 
   return (
@@ -243,7 +357,7 @@ const Roles = () => {
 
               <button
                 className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#6F4AE7] to-[#7A5AF8] px-4 text-xs font-semibold text-white shadow-sm shadow-[#6F4AE7]/20 transition-all hover:-translate-y-0.5 hover:shadow-md sm:w-auto"
-                onClick={() => alert("Create New Role")}
+                onClick={openNewRoleModal}
               >
                 <Plus size={16} />
                 Create New Role
@@ -270,7 +384,7 @@ const Roles = () => {
                     </div>
 
                     <button
-                      onClick={() => alert("Create New Role")}
+                      onClick={openNewRoleModal}
                       className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
                     >
                       <Plus size={13} />
@@ -363,7 +477,7 @@ const Roles = () => {
                     </span>{" "}
                     of{" "}
                     <span className="font-semibold text-slate-900">
-                      {rolesData.length}
+                      {roles.length}
                     </span>{" "}
                     roles
                   </p>
@@ -551,63 +665,80 @@ const Roles = () => {
                           </div>
 
                           {/* MODULE GRID */}
-                          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
-                            {filteredModules.map((module) => {
-                              const Icon = module.icon;
+                          {Object.entries(groupedModules).map(
+                            ([category, modules]) => (
+                              <div key={category} className="mb-5 last:mb-0">
+                                {/* CATEGORY LABEL */}
+                                <div className="mb-3 flex items-center gap-2">
+                                  <span className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                                    {category}
+                                  </span>
 
-                              const enabled = pageAccess[module.id];
-
-                              return (
-                                <div
-                                  key={module.id}
-                                  className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md"
-                                >
-                                  {/* MODULE HEADER */}
-                                  <div className="flex items-center justify-between gap-2 px-4 py-3.5">
-                                    <div className="flex min-w-0 items-center gap-2.5">
-                                      <div
-                                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                                        style={{
-                                          backgroundColor: `${module.color}1f`,
-                                          color: module.color,
-                                        }}
-                                      >
-                                        <Icon size={16} />
-                                      </div>
-
-                                      <div className="min-w-0">
-                                        <h3 className="truncate text-xs font-bold text-slate-900">
-                                          {module.title}
-                                        </h3>
-
-                                        <p className="truncate text-[11px] text-slate-500">
-                                          {module.description}
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    {/* TOGGLE */}
-                                    <button
-                                      onClick={() => togglePage(module.id)}
-                                      className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-                                      style={{
-                                        backgroundColor: enabled
-                                          ? module.color
-                                          : "#cbd5e1",
-                                      }}
-                                      aria-pressed={enabled}
-                                    >
-                                      <span
-                                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
-                                          enabled ? "left-[22px]" : "left-0.5"
-                                        }`}
-                                      />
-                                    </button>
-                                  </div>
+                                  <span className="h-px flex-1 bg-slate-100" />
                                 </div>
-                              );
-                            })}
-                          </div>
+
+                                <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+                                  {modules.map((module) => {
+                                    const Icon = module.icon;
+
+                                    const enabled = pageAccess[module.id];
+
+                                    return (
+                                      <div
+                                        key={module.id}
+                                        className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md"
+                                      >
+                                        {/* MODULE HEADER */}
+                                        <div className="flex items-center justify-between gap-2 px-4 py-3.5">
+                                          <div className="flex min-w-0 items-center gap-2.5">
+                                            <div
+                                              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                                              style={{
+                                                backgroundColor: `${module.color}1f`,
+                                                color: module.color,
+                                              }}
+                                            >
+                                              <Icon size={16} />
+                                            </div>
+
+                                            <div className="min-w-0">
+                                              <h3 className="truncate text-xs font-bold text-slate-900">
+                                                {module.title}
+                                              </h3>
+
+                                              <p className="truncate text-[11px] text-slate-500">
+                                                {module.description}
+                                              </p>
+                                            </div>
+                                          </div>
+
+                                          {/* TOGGLE */}
+                                          <button
+                                            onClick={() => togglePage(module.id)}
+                                            className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+                                            style={{
+                                              backgroundColor: enabled
+                                                ? module.color
+                                                : "#cbd5e1",
+                                            }}
+                                            aria-pressed={enabled}
+                                          >
+                                            <span
+                                              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                                                enabled
+                                                  ? "left-[22px]"
+                                                  : "left-0.5"
+                                              }`}
+                                            />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ),
+                          )}
 
                           {filteredModules.length === 0 && (
                             <div className="rounded-xl border border-dashed border-slate-200 py-12 text-center">
@@ -755,6 +886,114 @@ const Roles = () => {
           </div>
         </main>
       </div>
+
+      {/* NEW ROLE MODAL */}
+      {showNewRoleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            {/* MODAL HEADER */}
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#6F4AE7]/10 text-[#6F4AE7]">
+                  <ShieldCheck size={18} />
+                </div>
+
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900">
+                    Create New Role
+                  </h2>
+
+                  <p className="text-[11px] text-slate-500">
+                    Define a new role for your organization
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowNewRoleModal(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                aria-label="Close"
+              >
+                <X size={17} />
+              </button>
+            </div>
+
+            {/* MODAL BODY */}
+            <form onSubmit={createRole} className="px-5 py-5">
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                    Role Name <span className="text-red-500">*</span>
+                  </label>
+
+                  <input
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    placeholder="e.g. Production Manager"
+                    autoFocus
+                    required
+                    className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/15 focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                    Role Type
+                  </label>
+
+                  <div className="relative">
+                    <select
+                      value={newRoleType}
+                      onChange={(e) => setNewRoleType(e.target.value)}
+                      className="h-10 w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 px-3 pr-9 text-[13px] text-slate-800 outline-none transition focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/15 focus:bg-white"
+                    >
+                      <option value="Custom">Custom</option>
+                      <option value="System">System</option>
+                    </select>
+
+                    <ChevronRight
+                      size={15}
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-slate-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                    Description
+                  </label>
+
+                  <textarea
+                    value={newRoleDescription}
+                    onChange={(e) => setNewRoleDescription(e.target.value)}
+                    placeholder="Describe what this role can do..."
+                    rows={3}
+                    className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/15 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* MODAL FOOTER */}
+              <div className="mt-6 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowNewRoleModal(false)}
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="rounded-lg bg-gradient-to-r from-[#6F4AE7] to-[#7A5AF8] px-5 py-2 text-xs font-semibold text-white shadow-sm shadow-[#6F4AE7]/20 transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  Create Role
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

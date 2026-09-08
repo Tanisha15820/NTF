@@ -36,32 +36,13 @@ const chartData = {
   datasets: [
     {
       label: "Regular Wages",
-      data: [140, 155, 130, 165, 150, 110, 160, 140, 155, 130, 165, 150, 110, 160, 155, 138],
-      backgroundColor: "#06B6D4",
-      borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0,
-      },
-      borderSkipped: "bottom",
-    },
-    {
-      label: "Overtime (OT)",
-      data: [25, 35, 18, 40, 30, 15, 38, 25, 35, 18, 40, 30, 15, 38, 35, 22],
+      data: [
+        140, 155, 130, 165, 150, 110, 160, 140, 155, 130, 165, 150, 110, 160,
+        155, 138,
+      ],
       backgroundColor: "#F59E0B",
-      borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0,
-      },
-      borderSkipped: "bottom",
-    },
-    {
-      label: "Total Payout",
-      data: [165, 190, 148, 205, 180, 125, 198, 165, 190, 148, 205, 180, 125, 198, 190, 160],
-      backgroundColor: "#6F4AE7",
+      barThickness: 28,
+
       borderRadius: {
         topLeft: 5,
         topRight: 5,
@@ -151,7 +132,7 @@ const DailySalary = () => {
         <div className="flex items-center justify-between">
           {/* Left side */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F46E5]">
+            <div className="w-9 h-9 rounded-lg bg-[#eafef5] flex items-center justify-center text-[#02bc7b]">
               <PaymentsIcon sx={{ fontSize: 20 }} />
             </div>
 

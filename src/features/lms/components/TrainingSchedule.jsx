@@ -1,314 +1,372 @@
 import { useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import logo from "../../../assets/images/NTF_logo_black.png";
 
-const EMPTY_PARTICIPANT = {
-  name: "",
+const EMPTY_ROW = {
+  participant: "",
   department: "",
   designation: "",
 };
 
 const TrainingSchedule = () => {
-  const [form, setForm] = useState({
+  const [rows, setRows] = useState([{ ...EMPTY_ROW }]);
+
+  // Training information
+  const [details, setDetails] = useState({
     title: "",
     trainer: "",
     date: "",
     periodFrom: "",
     periodTo: "",
-    type: "Internal",
+    internalExternal: "",
     venue: "",
   });
 
-  const [participants, setParticipants] = useState([{ ...EMPTY_PARTICIPANT }]);
-
-  const handleFormChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+  // Change training details
+  const handleDetailChange = (field) => (event) => {
+    setDetails({
+      ...details,
+      [field]: event.target.value,
+    });
   };
 
-  const handleParticipantChange = (index, field) => (event) => {
-    setParticipants((prev) =>
-      prev.map((row, idx) =>
-        idx === index ? { ...row, [field]: event.target.value } : row
-      )
-    );
+  // Change participant table data
+  const handleRowChange = (index, field) => (event) => {
+    const updatedRows = [...rows];
+
+    updatedRows[index][field] = event.target.value;
+
+    setRows(updatedRows);
   };
 
-  const addParticipantRow = () => {
-    setParticipants((prev) => [...prev, { ...EMPTY_PARTICIPANT }]);
+  // Add a new participant row
+  const addRow = () => {
+    setRows([...rows, { ...EMPTY_ROW }]);
   };
-
-  const removeParticipantRow = (index) => {
-    setParticipants((prev) =>
-      prev.length === 1
-        ? [{ ...EMPTY_PARTICIPANT }]
-        : prev.filter((_, idx) => idx !== index)
-    );
-  };
-
-  const inputClass =
-    "h-9 w-full rounded-lg border border-gray-200 bg-white px-3 text-xs text-gray-700 outline-none transition focus:border-[#6F4AE7] focus:ring-2 focus:ring-[#6F4AE7]/10";
-
-  const labelClass = "mb-1.5 block text-[11px] font-semibold text-gray-600";
 
   return (
-    <div className="space-y-5">
-      {/* HEADER */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-gray-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary-dark shadow-sm">
-              <CalendarTodayOutlinedIcon sx={{ color: "#fff", fontSize: 22 }} />
+    <>
+      {/* PRINT BUTTON + ADD BUTTON */}
+      <div className="mb-4 flex items-center justify-end gap-2 print:hidden">
+        <button
+          type="button"
+          onClick={addRow}
+          className="flex items-center gap-2 border border-gray-400 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          <AddOutlinedIcon sx={{ fontSize: 18 }} />
+          Add Participant
+        </button>
+
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="flex items-center gap-2 bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+        >
+          <PrintOutlinedIcon sx={{ fontSize: 18 }} />
+          Print
+        </button>
+      </div>
+
+      {/* MAIN FORM */}
+      <div className="mx-auto w-full max-w-[1100px] bg-white p-3 text-black sm:p-5 print:max-w-none print:p-0">
+        {/* OUTER BORDER */}
+        <div className="border border-black">
+          {/* =====================================================
+              HEADER
+          ====================================================== */}
+          <div className="grid grid-cols-[90px_1fr_300px] border-b border-black">
+            {/* NTF */}
+            <div className="flex items-center justify-center border-r border-black">
+              <img
+                src={logo}
+                alt="NTF Logo"
+                className="h-15 w-auto object-contain"
+              />
             </div>
 
-            <div>
-              <h2 className="text-base font-bold text-gray-900 leading-tight">
-                Training Schedule
-              </h2>
-              <p className="text-xs text-gray-500">
-                Plan and manage the training programme for new manpower
-              </p>
+            {/* TITLE */}
+            <div className="flex items-center justify-center">
+              <h1 className="text-xl font-bold tracking-wide sm:text-2xl">
+                TRAINING SCHEDULE
+              </h1>
+            </div>
+
+            {/* DOCUMENT INFORMATION */}
+            <div className="border-l border-black text-xs">
+              <div className="flex min-h-[30px] items-center border-b border-black px-2">
+                <span>Doc.No: TF-05(A.MD-02)</span>
+              </div>
+
+              <div className="flex min-h-[30px] items-center border-b border-black px-2">
+                <span>Issue Date: 02.08.2014</span>
+              </div>
+
+              <div className="flex min-h-[30px] items-center px-2">
+                <span>Rev.No:00</span>
+              </div>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={addParticipantRow}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#6F4AE7] px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-[#5F3ED1]"
-          >
-            <GroupsOutlinedIcon sx={{ fontSize: 18 }} />
-            Add Participant
-          </button>
-        </div>
+          {/* =====================================================
+              TRAINING INFORMATION
+          ====================================================== */}
+          <div className="border-b border-black px-3 py-3 text-sm sm:px-4">
+            {/* TRAINING TITLE */}
+            <div className="mb-3 flex items-center">
+              <label className="whitespace-nowrap font-medium">
+                Training Title/ Subject
+              </label>
 
-        {/* DOC REFERENCE */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 bg-gray-50/60 px-5 py-3">
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Doc. No.:</span>{" "}
-            F-05(AMD-02)
-          </p>
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Issue Date:</span>{" "}
-            02.08.2014
-          </p>
-          <p className="text-[12px] text-gray-600">
-            <span className="font-semibold text-gray-700">Rev. No.:</span> 00
-          </p>
-        </div>
-      </div>
+              <input
+                type="text"
+                value={details.title}
+                onChange={handleDetailChange("title")}
+                className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+              />
+            </div>
 
-      {/* TRAINING DETAILS */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="border-b border-gray-100 px-5 py-4">
-          <h3 className="text-sm font-bold text-gray-900">
-            Training Details
-          </h3>
-        </div>
+            {/* TRAINER + INTERNAL/EXTERNAL */}
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex flex-1 items-center">
+                <label className="whitespace-nowrap font-medium">
+                  Name of Trainer
+                </label>
 
-        <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="sm:col-span-2 lg:col-span-3">
-            <label className={labelClass}>Training Title / Subject</label>
-            <input
-              value={form.title}
-              onChange={handleFormChange("title")}
-              placeholder="Enter training title / subject"
-              className={inputClass}
-            />
+                <input
+                  type="text"
+                  value={details.trainer}
+                  onChange={handleDetailChange("trainer")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+                />
+              </div>
+
+              <div className="flex items-center sm:w-[40%]">
+                <label className="whitespace-nowrap font-medium">
+                  Internal/External
+                </label>
+
+                <input
+                  type="text"
+                  value={details.internalExternal}
+                  onChange={handleDetailChange("internalExternal")}
+                  className="ml-2 w-full border-0 bg-transparent px-1 outline-none"
+                />
+              </div>
+            </div>
+
+            {/* DATE / PERIOD / PLACE-VENUE */}
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_1fr]">
+              {/* DATE */}
+              <div className="flex items-center">
+                <label className="whitespace-nowrap">Date</label>
+
+                <input
+                  type="text"
+                  value={details.date}
+                  onChange={handleDetailChange("date")}
+                  className="ml-2 w-full border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+                />
+              </div>
+
+              {/* PERIOD */}
+              <div className="flex items-center gap-2">
+                <label className="whitespace-nowrap">Period</label>
+
+                <input
+                  type="text"
+                  value={details.periodFrom}
+                  onChange={handleDetailChange("periodFrom")}
+                  className="w-full border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+                />
+
+                <span>to</span>
+
+                <input
+                  type="text"
+                  value={details.periodTo}
+                  onChange={handleDetailChange("periodTo")}
+                  className="w-full border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+                />
+              </div>
+
+              {/* PLACE / VENUE */}
+              <div className="flex items-center justify-end">
+                <label className="whitespace-nowrap">Place/Venue</label>
+
+                <input
+                  type="text"
+                  value={details.venue}
+                  onChange={handleDetailChange("venue")}
+                  className="ml-3 w-full border-0 border-b border-dotted border-black bg-transparent px-1 outline-none"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="sm:col-span-2 lg:col-span-1">
-            <label className={labelClass}>Name of Trainer</label>
-            <input
-              value={form.trainer}
-              onChange={handleFormChange("trainer")}
-              placeholder="Enter trainer name"
-              className={inputClass}
-            />
-          </div>
+          {/* =====================================================
+              INSTRUCTION
+          ====================================================== */}
+          <div className="border-b border-black px-3 py-2 text-sm sm:px-4">
+            <p className="font-medium leading-5">
+              Following employees are required to attend the above training
+              Programme.
+            </p>
 
-          <div className="sm:col-span-2 lg:col-span-1"></div>
-
-          <div className="sm:col-span-2 lg:col-span-1">
-            <label className={labelClass}>Date</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={handleFormChange("date")}
-              className={inputClass}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Period (From)</label>
-            <input
-              type="time"
-              value={form.periodFrom}
-              onChange={handleFormChange("periodFrom")}
-              className={inputClass}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Period (To)</label>
-            <input
-              type="time"
-              value={form.periodTo}
-              onChange={handleFormChange("periodTo")}
-              className={inputClass}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Internal / External</label>
-            <select
-              value={form.type}
-              onChange={handleFormChange("type")}
-              className={inputClass}
-            >
-              <option value="Internal">Internal</option>
-              <option value="External">External</option>
-            </select>
-          </div>
-
-          <div className="sm:col-span-2 lg:col-span-3">
-            <label className={labelClass}>Place / Venue</label>
-            <input
-              value={form.venue}
-              onChange={handleFormChange("venue")}
-              placeholder="Enter place / venue"
-              className={inputClass}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* INSTRUCTION */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-2 text-sm font-bold text-gray-900">Instruction</h3>
-        <p className="text-xs leading-5 text-gray-600">
-          Following employees are required to attend the above training
-          Programme. Trainer, HOD &amp; participants are hereby informed to do
-          the needful.
-        </p>
-      </div>
-
-      {/* PARTICIPANTS TABLE */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-1 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-gray-900">
-              Participants Attendance
-            </h3>
-            <p className="text-xs text-gray-500">
-              List the employees required to attend this training
+            <p className="font-medium leading-5">
+              Trainer, HOD &amp; participants are hereby informed to do the
+              needful
             </p>
           </div>
-          <p className="text-xs text-gray-500">
-            Total participants:{" "}
-            <span className="font-semibold text-[#6F4AE7]">
-              {participants.length}
-            </span>
-          </p>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] border-collapse">
-            <thead>
-              <tr className="bg-gray-100/80">
-                <th className="w-14 border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  S. No.
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Name of Participants
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Departments
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Designation
-                </th>
-                <th className="border-b border-r border-gray-200 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Sign. HOD
-                </th>
-                <th className="border-b border-gray-200 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  Sign. Participants
-                </th>
-                <th className="w-14 border-b border-gray-200 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-gray-600">
-                  &nbsp;
-                </th>
-              </tr>
-            </thead>
+          {/* =====================================================
+              PARTICIPANT TABLE
+          ====================================================== */}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] border-collapse">
+              {/* TABLE HEADER */}
+              <thead>
+                {/* FIRST HEADER ROW */}
+                <tr>
+                  {/* S.NO */}
+                  <th
+                    rowSpan="2"
+                    className="w-[55px] border-r border-black px-2 py-2 text-center text-xs font-bold"
+                  >
+                    S. NO.
+                  </th>
 
-            <tbody>
-              {participants.map((participant, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 last:border-0 hover:bg-primary/5"
-                >
-                  <td className="border-r border-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-700">
-                    {index + 1}
-                  </td>
-                  <td className="border-r border-gray-100 px-4 py-2.5">
-                    <input
-                      value={participant.name}
-                      onChange={handleParticipantChange(index, "name")}
-                      placeholder="Participant name"
-                      className={inputClass}
-                    />
-                  </td>
-                  <td className="border-r border-gray-100 px-4 py-2.5">
-                    <input
-                      value={participant.department}
-                      onChange={handleParticipantChange(index, "department")}
-                      placeholder="Department"
-                      className={inputClass}
-                    />
-                  </td>
-                  <td className="border-r border-gray-100 px-4 py-2.5">
-                    <input
-                      value={participant.designation}
-                      onChange={handleParticipantChange(index, "designation")}
-                      placeholder="Designation"
-                      className={inputClass}
-                    />
-                  </td>
-                  <td className="border-r border-gray-100 px-4 py-2.5" />
-                  <td className="border-r border-gray-100 px-4 py-2.5" />
-                  <td className="px-4 py-2.5 text-center">
-                    <button
-                      type="button"
-                      onClick={() => removeParticipantRow(index)}
-                      title="Remove row"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-red-50 hover:text-red-500"
-                    >
-                      <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
-                    </button>
-                  </td>
+                  {/* PARTICIPANTS */}
+                  <th
+                    rowSpan="2"
+                    className="w-[260px] border-r border-black px-2 py-2 text-left text-xs font-bold"
+                  >
+                    NAME OF PARTICIPANTS
+                  </th>
+
+                  {/* DEPARTMENT */}
+                  <th
+                    rowSpan="2"
+                    className="w-[180px] border-r border-black px-2 py-2 text-left text-xs font-bold"
+                  >
+                    DEPARTMENTS
+                  </th>
+
+                  {/* DESIGNATION */}
+                  <th
+                    rowSpan="2"
+                    className="w-[170px] border-r border-black px-2 py-2 text-left text-xs font-bold"
+                  >
+                    DESIGNATION
+                  </th>
+
+                  {/* ACKNOWLEDGEMENT */}
+                  <th
+                    colSpan="2"
+                    className="border-b border-black px-2 py-2 text-center text-xs font-bold"
+                  >
+                    ACKNOWLEDGEMENT
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
 
-        <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
-          <p className="text-xs text-gray-500">
-            Click row{" "}
-            <span className="font-semibold text-[#6F4AE7]">+ Add Participant</span>{" "}
-            to add more employees
-          </p>
+                {/* SECOND HEADER ROW */}
+                <tr>
+                  <th className="w-[150px] border-r border-black px-2 py-2 text-center text-xs font-bold">
+                    SIGN. HOD
+                  </th>
 
-          <button
-            type="button"
-            onClick={addParticipantRow}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#E5E7EB] px-4 text-xs font-semibold text-[#6F4AE7] transition hover:border-[#6F4AE7] hover:bg-[#6F4AE7]/5"
-          >
-            <AddOutlinedIcon sx={{ fontSize: 18 }} />
-            Add Row
-          </button>
+                  <th className="w-[180px] px-2 py-2 text-center text-xs font-bold">
+                    SIGN. PARTICIPANTS
+                  </th>
+                </tr>
+              </thead>
+
+              {/* TABLE BODY */}
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={index}>
+                    {/* S.NO */}
+                    <td className="h-[48px] border-r border-t border-black px-2 text-center text-sm">
+                      {index + 1}
+                    </td>
+
+                    {/* NAME OF PARTICIPANT */}
+                    <td className="border-r border-t border-black px-2">
+                      <input
+                        type="text"
+                        value={row.participant}
+                        onChange={handleRowChange(index, "participant")}
+                        className="w-full border-0 bg-transparent text-sm outline-none"
+                      />
+                    </td>
+
+                    {/* DEPARTMENT */}
+                    <td className="border-r border-t border-black px-2">
+                      <input
+                        type="text"
+                        value={row.department}
+                        onChange={handleRowChange(index, "department")}
+                        className="w-full border-0 bg-transparent text-sm outline-none"
+                      />
+                    </td>
+
+                    {/* DESIGNATION */}
+                    <td className="border-r border-t border-black px-2">
+                      <input
+                        type="text"
+                        value={row.designation}
+                        onChange={handleRowChange(index, "designation")}
+                        className="w-full border-0 bg-transparent text-sm outline-none"
+                      />
+                    </td>
+
+                    {/* SIGN HOD */}
+                    <td className="border-r border-t border-black">
+                      {/* Empty signature area */}
+                    </td>
+
+                    {/* SIGN PARTICIPANTS */}
+                    <td className="border-t border-black">
+                      {/* Empty signature area */}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* =====================================================
+          PRINT CSS
+      ====================================================== */}
+      <style>
+        {`
+          @media print {
+
+            body {
+              margin: 0;
+              padding: 0;
+              background: white;
+            }
+
+            .print\\:hidden {
+              display: none !important;
+            }
+
+            input {
+              color: black !important;
+              background: transparent !important;
+            }
+
+            @page {
+              size: A4 landscape;
+              margin: 8mm;
+            }
+          }
+        `}
+      </style>
+    </>
   );
 };
 

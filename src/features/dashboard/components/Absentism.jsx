@@ -35,39 +35,20 @@ const chartData = {
   labels,
   datasets: [
     {
-      label: "Planned Leave",
-      data: [12, 15, 8, 14, 10, 6, 16, 12, 15, 8, 14, 10, 6, 16, 15, 10],
-      backgroundColor: "#3B82F6",
+      label: "Requirement",
+      data: [45, 55, 40, 60, 50, 34, 60, 45, 55, 40, 60, 50, 34, 60, 55, 45],
+      backgroundColor: "#feb532",
+
+      // Fixed thin bar width
+      barThickness: 28,
+
       borderRadius: {
         topLeft: 5,
         topRight: 5,
         bottomLeft: 0,
         bottomRight: 0,
       },
-      borderSkipped: "bottom",
-    },
-    {
-      label: "Unplanned Absent",
-      data: [18, 25, 14, 28, 22, 12, 26, 18, 25, 14, 28, 22, 12, 26, 25, 18],
-      backgroundColor: "#EF4444",
-      borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0,
-      },
-      borderSkipped: "bottom",
-    },
-    {
-      label: "Total Absent",
-      data: [30, 40, 22, 42, 32, 18, 42, 30, 40, 22, 42, 32, 18, 42, 40, 28],
-      backgroundColor: "#6F4AE7",
-      borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0,
-      },
+
       borderSkipped: "bottom",
     },
   ],
@@ -148,7 +129,7 @@ const Absentism = () => {
         <div className="flex items-center justify-between">
           {/* Left side */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#4F46E5]">
+            <div className="w-9 h-9 rounded-lg bg-[#fff0f0] flex items-center justify-center text-[#e92553]">
               <EventBusyIcon sx={{ fontSize: 20 }} />
             </div>
 
@@ -156,7 +137,6 @@ const Absentism = () => {
               <h2 className="text-sm font-bold text-slate-800">
                 Daily Absenteeism
               </h2>
-
               <p className="text-[10px] text-slate-500 mt-0.5">
                 Tracking planned vs unplanned absenteeism movement
               </p>
@@ -168,7 +148,6 @@ const Absentism = () => {
             {/* Monthly average */}
             <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-
               <span className="text-[10px] font-semibold text-rose-600">
                 Monthly Average: 4.8%
               </span>

@@ -5,33 +5,10 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import Filters from "../../../components/Filters";
-
-const rows = [
-  {
-    id: 1,
-    title: "CNC MANUAL SAFETY MODULE TEST PAPER 1",
-    target: "80% or Above",
-    testType: "Online",
-    course: "Life Skills",
-    passing: "80% or Above",
-    qualified: true,
-    marks: "8 Marks",
-    fullMarks: "Full Marks",
-  },
-  {
-    id: 2,
-    title: "CNC MANUAL SAFETY MODULE TEST PAPER 1",
-    target: "80% or Above",
-    testType: "Online",
-    course: "Life Skills",
-    passing: "80% or Above",
-    qualified: true,
-    marks: "8 Marks",
-    fullMarks: "Full Marks",
-  },
-];
+import { getSavedPapers } from "../utils/testPapers";
 
 const QuestionPaperTable = ({ onCreate }) => {
+  const [rows] = useState(() => getSavedPapers());
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
