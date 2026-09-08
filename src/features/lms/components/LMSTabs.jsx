@@ -25,7 +25,7 @@ const LMSTabs = ({ tabs = defaultTabs, activeTab, onTabChange }) => {
   };
 
   return (
-    <div className="w-full border-b border-gray-200 bg-white">
+    <div className="w-full overflow-x-auto border-b border-gray-200 bg-white">
       <div className="flex min-w-max items-center gap-0 px-5">
         {tabs.map((tab) => {
           const isActive = selectedTab === tab;
